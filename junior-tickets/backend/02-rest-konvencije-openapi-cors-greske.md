@@ -34,3 +34,14 @@ Uvesti **ugovor** za sve REST endpoint-e: verzija u putanji, konzistentan JSON z
 
 - Ne širiti različite formate grešaka po slice-ovima; sve kroz advice.
 - Razlikujte **400** (klijent) od **422** (validacija) ako tim tako želi — ali budite konzistentni.
+
+## Plan za AI agenta
+
+1. **Zavisnosti**: dodati `springdoc-openapi-starter-webmvc-ui`; u `application-local.yml` omogućiti swagger; u `application-prod.yml` (ili profil `prod`) isključiti `springdoc.api-docs.enabled=false` ako je politika.
+2. **DTO greške**: definisati jedan record/klasa npr. `ApiError` sa poljima `code`, `message`, `details` (lista stringova ili mapa); dokumentovati u README.
+3. **`@RestControllerAdvice`**: handler za `MethodArgumentNotValidException`, `ConstraintViolationException`, `ResponseStatusException`, generički `Exception` (500) sa istom šemom; mapiranje `404` za `NoHandlerFoundException` ako je uključeno.
+4. **HTTP kodovi**: fiksirati mapu — npr. validacija →422, poslovno pravilo → 409 (stub), ilegalni argument → 400.
+5. **CORS**: `CorsConfigurationSource` bean ili `WebMvcConfigurer#addCorsMappings` čitajući `app.cors.allowed-origins` iz YAML (npr. `http://localhost:5173`, `http://localhost:5174`).
+6. **Novac**: uvesti `MoneyResponse` record (`amount: string`, `currency: "RSD"`) ili dogovoreni format; dodati primer u OpenAPI (`@Schema`); dokumentovati u `docs/API_MONEY.md` ili backend README.
+7. **Testovi**: jedan `@WebMvcTest` na dummy kontroler sa `@Valid` koji baca grešku i assertuje JSON strukturu; jedan test koji proverava CORS preflight ako je jednostavno.
+8. **Konvencija URL**: svi kontroleri ispod `/api/v1/**` koriste isti `produces = MediaType.APPLICATION_JSON_VALUE` gde ima smisla.

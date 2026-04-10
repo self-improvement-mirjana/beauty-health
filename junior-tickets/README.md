@@ -8,7 +8,8 @@ Tiketi su podeljeni po **tri linije isporuke** iz `SPECIFIKACIJA_ZAHTEVA.md` (od
 
 ## Kako koristiti
 
-- Svaki fajl je jedan tiket: **cilj**, **opseg**, **kriterijumi prihvatanja**, **zavisnosti**, **napomene za juniore**.
+- Svaki fajl je jedan tiket: **cilj**, **opseg**, **kriterijumi prihvatanja**, **zavisnosti**, **napomene za juniore**, i sekcija **Plan za AI agenta** (korak-po-korak plan za implementaciju).
+- Referentni **ER dijagram** i odnosi entiteta: [`DATA_MODEL.md`](DATA_MODEL.md).
 - Redni brojevi unutar foldera su preporučeni redosled unutar te linije; paralelno se mogu raditi stvari koje nemaju međusobne zavisnosti (naznačeno u tiketu).
 - Funkcionalni detalji kupca i dalje dolaze iz ostatka specifikacije (katalog, PDP, korpa, itd.); backend tiketi mapiraju te zahteve na **API i perzistenciju**.
 

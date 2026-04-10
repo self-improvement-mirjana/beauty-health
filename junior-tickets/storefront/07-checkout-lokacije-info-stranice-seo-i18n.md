@@ -18,7 +18,7 @@ Završiti **kupčki** tok do nivoa definisanog specifikacijom: checkout ulaz iz 
 ## Kriterijumi prihvatanja
 
 - [ ] Uspešno kreiranje narudžbine (happy path) kada je B07 spreman.
-- [ ]404 stranica za nepoznat slug sadržaja.
+- [ ] 404 stranica za nepoznat slug sadržaja.
 - [ ] Dokumentovana politika SR/EN stringova (specifikacija 10).
 
 ## Zavisnosti
@@ -28,3 +28,13 @@ Završiti **kupčki** tok do nivoa definisanog specifikacijom: checkout ulaz iz 
 ## Za juniore
 
 - Ne blokirati MVP na savršenom checkout-u — eksplicitno labelirati “phase 2” polja dok proizvod ne dostavi TBD.
+
+## Plan za AI agenta
+
+1. **Checkout stranica**: korak “Pregled korpe” → “Podaci” → “Potvrda” ako je potrebno; MVP: jedna forma koja šalje DTO iz B07; disabled submit dok nisu obavezna polja popunjena.
+2. **Rokovi isporuke**: prikazati tekst iz konfiguracije (`GET /pages/shipping` ili statički ključ) — uskladiti sa B09.
+3. **Lokacije**: `LocationsPage` grid kartica iz `GET /api/v1/locations` (retail lokacije, ne inventar).
+4. **CMS stranice**: `ContentPage` dinamički učitava `GET /api/v1/pages/{slug}`; 404 komponenta za nepoznat slug.
+5. **Helmet**: dinamički `title` iz CMS `title` polja.
+6. **i18n**: ako nije u opsegu, kreirati `docs/I18N.md` sa odlukom “SR only za sada”; inače pripremiti `react-i18next` stub.
+7. **Happy path E2E (opciono)**: Playwright login → dodaj u korpu → checkout (ako stabilno u CI).

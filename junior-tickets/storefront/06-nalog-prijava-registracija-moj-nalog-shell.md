@@ -27,3 +27,13 @@ Forme za **registraciju i prijavu** povezane sa B03; osnovna **korisnička zona*
 ## Za juniore
 
 - Kada stigne screenshot “Moj nalog”, dodati tikete za adrese, promenu lozinke, istoriju — ne nagađati polja.
+
+## Plan za AI agenta
+
+1. **Stranice**: `LoginPage`, `RegisterPage`, `AccountLayout` sa outlet-om za podstranice.
+2. **Forme**: `react-hook-form` + validacija (Zod); submit poziva B03 endpointe; prikaz field-level grešaka iz B02 `details`.
+3. **Sesija**: ako JWT — čuvati u memoriji + refresh token pattern **ili** httpOnly cookie (bez JS pristupa); implementacija mora tačno pratiti backend README iz B03.
+4. **Protected route**: `RequireAuth` wrapper koji čita auth slice; redirect na `/login?next=`.
+5. **Merge korpe**: nakon uspešnog logina pozvati B06 merge endpoint ako postoji, ili invalidirati cart query.
+6. **Account home**: placeholder kartice “Porudžbine (uskoro)” dok nema specifikacije 11.
+7. **Logout**: poziv backend `logout` ako postoji + čišćenje state-a.

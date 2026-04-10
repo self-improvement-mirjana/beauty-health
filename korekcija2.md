@@ -53,3 +53,6 @@ erDiagram
     BIGINT category_id FK
   }
 
+---
+
+**Repo:** isti ER je prenet u [`junior-tickets/DATA_MODEL.md`](junior-tickets/DATA_MODEL.md). U svakom tiketu (`backend/`, `storefront/`, `moderator/`) dodata je sekcija **„Plan za AI agenta“** sa koracima implementacije usklađenim sa ovim modelom.

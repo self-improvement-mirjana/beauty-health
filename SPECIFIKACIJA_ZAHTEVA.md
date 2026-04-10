@@ -21,7 +21,7 @@ Implementacija se deli na **tri isporuke** koje dele isti domen, ali imaju odvoj
 
 **Principi integracije**
 
-- Jedan **PostgreSQL** kao izvor istine; migracije šeme (npr. Flyway ili Liquibase) žive u backend projektu.
+- Jedan **PostgreSQL** kao izvor istine; migracije šeme (**Liquibase**) žive u backend projektu.
 - Ugovor između frontova i backenda: **verzionisani REST** resursi, konzistentni kodovi grešaka i format datuma/novca (npr. `BigDecimal` / string u API-ju + jasna konvencija za RSD prikaz na UI).
 - **Vertical slice** na backendu znači: izbegavati “anemičan” slojeviti monolit gde sve ide kroz iste generičke pakete bez domenskog smisla; umesto toga, funkcionalnost se dodaje kao kohezivan modul koji se može razumeti i testirati zasebno.
 

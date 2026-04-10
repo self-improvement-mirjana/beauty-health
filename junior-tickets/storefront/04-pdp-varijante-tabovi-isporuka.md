@@ -28,3 +28,13 @@ Kompletan **PDP** prema specifikaciji: osnovni blok, izbor varijanti, tabovi/sek
 ## Za juniore
 
 - Ne držati velike HTML blob-ove u komponentama ako dolaze iz CMS-a — render preko `dangerouslySetInnerHTML` samo uz sanitizaciju (DOMPurify).
+
+## Plan za AI agenta
+
+1. **API**: `getProductBySlug(slug)` — response uključuje brend, listu opcija (`product_option` + `values`), varijante sa `chosenOptions`, zalihe, HTML/markdown polja za tabove.
+2. **State varijanti**: lokalni `useReducer` ili `useState` za izabrane `optionValueId`-eve; izračunati `selectedVariantId` koji odgovara kombinaciji; ako nema poklapanja, prikazati “Nedostupna kombinacija”.
+3. **CTA**: dugme “Dodaj u korpu” aktivno samo kada je varijanta odabrana i `inStock`; inače link/tekst “Odaberite opcije”.
+4. **Tabovi**: `Tabs` komponenta (Headless UI ili ručno) sa panelima Opis / Dodatno / Recenzije / Isporuka / Napomena; sadržaj iz PDP DTO ili `GET /pages/...` ako je izdvojeno.
+5. **Cross-sell**: feature flag `VITE_FEATURE_BUNDLE` koji prikazuje sekciju samo ako API vrati podatke.
+6. **SEO**: `Helmet` sa `title` iz naziva proizvoda; `meta description` iz prvog pasusa.
+7. **Test (opciono)**: RTL test za izbor opcija i aktivaciju dugmeta.

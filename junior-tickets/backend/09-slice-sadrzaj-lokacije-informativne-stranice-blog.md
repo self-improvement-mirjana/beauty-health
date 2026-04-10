@@ -27,3 +27,12 @@ REST za **sadržaj** koji nije katalog: lokacije prodavnica, statičke/info stra
 ## Za juniore
 
 - Ne hardkodirati tekst u frontu za pravno bitne stranice ako treba menjati bez deploy-a fronta — držati u bazi.
+
+## Plan za AI agenta
+
+1. **Liquibase**: minimalno `cms_page` (id, slug UK, title, body_markdown ili body_html, published boolean, updated_at); `blog_post` (id, slug, title, excerpt, body, published_at) ako je blog u opsegu; `cms_page_category` kao M:N ako ER zahteva grupisanje.
+2. **Lokacije prodavnica (spec 8)**: odvojena tabela `retail_location` (naziv, adresa, telefon, hours_text) — **ne mešati** sa `store_location` iz inventara (ER `STORE_LOCATION`) osim ako tim eksplicitno spoji koncepte; u README objasniti dve uloge.
+3. **API (read)**: `GET /api/v1/pages/{slug}`, `GET /api/v1/locations` (retail), `GET /api/v1/blog` + `GET /api/v1/blog/{slug}` ako postoji blog.
+4. **Seed**: Liquibase ili SQL sa slug-ovima iz `SPECIFIKACIJA_ZAHTEVA.md` odjeljak 9 (FAQ, kontakt, …).
+5. **Sanitizacija**: ako je HTML, backend koristi sanitajzer pri čuvanju (moderacija) ili čuva markdown i front renderuje bezopasno.
+6. **Testovi**: `@WebMvcTest` za nepoznat slug → 404 po B02 formatu.
