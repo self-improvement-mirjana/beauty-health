@@ -9,6 +9,22 @@ Ovaj dokument definiše **funkcionalne zahteve** (šta sistem mora da radi) za e
 - **Valuta**: RSD, format npr. `3.600,00 RSD`.
 - **Napomena o “derived” pristupu**: gde UI ne prikazuje eksplicitno (npr. kupon u korpi), zahtevi se navode kao **TBD** ili se ne nameću.
 
+### 0.1 Tehnička arhitektura i obavezni stack
+
+Implementacija se deli na **tri isporuke** koje dele isti domen, ali imaju odvojene aplikacije i jasno razdvojene REST granice:
+
+| Isporuka | Tehnologije | Napomena |
+|--------|-------------|----------|
+| **Backend** | **Java 17+**, **Spring Boot 3.x**, **PostgreSQL**, **REST (JSON)** | Organizacija koda po **vertical slices** (npr. `catalog`, `cart`, `orders`, `auth`, `moderation`): svaki slice sadrži sve slojeve potrebne za tu domensku sposobnost (API, servis, perzistencija u okviru modula), uz zajedničke cross-cutting koncerne (bezbednost, validacija, mapiranje). |
+| **Frontend — korisnički sajt (storefront)** | **React** (npr. Vite), **Redux** (preporuka: Redux Toolkit), **Tailwind CSS**, uobičajeni prateći alati (ruter, HTTP klijent, form validacija) | Jedan SPA za goste i registrovane korisnike; potrošač REST API-ja backenda. Tailwind klase i layout mogu biti **uglavnom generisani/asistirani LLM-om**, uz ručnu reviziju za konzistentnost i pristupačnost. |
+| **Frontend — moderacija** | Isti stack kao storefront (**React + Redux + Tailwind**) | Odvojena aplikacija (odvojen build/deploy) za uloge koje upravljaju katalogom, cenama, zalihama, narudžbinama i sadržajem; pozivi na **moderatorske/admin REST** endpoint-e sa strožijom autorizacijom. |
+
+**Principi integracije**
+
+- Jedan **PostgreSQL** kao izvor istine; migracije šeme (npr. Flyway ili Liquibase) žive u backend projektu.
+- Ugovor između frontova i backenda: **verzionisani REST** resursi, konzistentni kodovi grešaka i format datuma/novca (npr. `BigDecimal` / string u API-ju + jasna konvencija za RSD prikaz na UI).
+- **Vertical slice** na backendu znači: izbegavati “anemičan” slojeviti monolit gde sve ide kroz iste generičke pakete bez domenskog smisla; umesto toga, funkcionalnost se dodaje kao kohezivan modul koji se može razumeti i testirati zasebno.
+
 ---
 
 ## 1) Uloge i pristup
@@ -24,9 +40,11 @@ Ovaj dokument definiše **funkcionalne zahteve** (šta sistem mora da radi) za e
 - Može da se prijavi/registruje preko “Moj nalog”.
 - Nakon prijave ima pristup korisničkoj zoni (“Moj nalog”) i kupovini.
 
-### 1.3 Administrator (izvan UI opsega)
+### 1.3 Moderator sajta (posebna aplikacija)
 
-Administratorske funkcije nisu vidljive iz UI isečka; podrazumevaju se minimalno: upravljanje proizvodima/cenama/zalihama/sadržajem i narudžbinama.
+- Pristup preko **odvojenog moderatorskog frontenda** (ne kroz isti UI kao kupac).
+- Minimalni opseg: upravljanje **proizvodima** (uključujući varijante), **cenama** i **zalihama**, **sadržajem** (informativne stranice, blog ako postoji, lokacije), **narudžbinama** (pregled, promena statusa), i **korisnicima** u meri potrebnoj za podršku (bez javnog kataloga funkcija).
+- Backend mora da razlikuje **javne** endpoint-e (storefront) od **moderatorskih** (role/scope, jača autentikacija, audit po potrebi).
 
 ---
 
