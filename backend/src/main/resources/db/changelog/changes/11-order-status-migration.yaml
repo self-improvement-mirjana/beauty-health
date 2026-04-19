@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: b11-migrate-order-status-legacy-values
+      author: beautyhealth
+      comment: Map legacy B07 status values to B11 workflow names (VARCHAR column).
+      changes:
+        - sql:
+            splitStatements: false
+            sql: UPDATE orders SET status = 'CONFIRMED' WHERE status = 'PAID';
+        - sql:
+            splitStatements: false
+            sql: UPDATE orders SET status = 'COMPLETED' WHERE status = 'FULFILLED';

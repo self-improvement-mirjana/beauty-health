@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-white text-neutral-900 antialiased;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+@layer components {
+  .skip-link {
+    @apply fixed left-4 top-4 z-[100] -translate-y-[220%] rounded-md bg-white px-4 py-2 text-sm font-medium text-neutral-900 shadow-lg transition-transform focus:translate-y-0 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900;
+  }
+}
+
+@layer base {
+  a:focus-visible,
+  button:focus-visible,
+  /* Bez globalnog outline-a na inputima — pravougaonik ne prati pill-search; fokus rešava sam wrapper. */
+  input:focus-visible:not(.bh-header-search-input) {
+    @apply outline outline-2 outline-offset-2 outline-neutral-900;
+  }
+}

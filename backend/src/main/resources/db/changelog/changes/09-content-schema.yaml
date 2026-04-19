@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: b09-create-cms-page
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: cms_page
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: slug, type: VARCHAR(128), constraints: { nullable: false, unique: true } }
+              - column: { name: title, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: body_markdown, type: CLOB, constraints: { nullable: false } }
+              - column: { name: published, type: BOOLEAN, constraints: { nullable: false }, defaultValueBoolean: true }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMP, constraints: { nullable: false } }
+        - createIndex:
+            indexName: idx_cms_page_published
+            tableName: cms_page
+            columns:
+              - column: { name: published }
+
+  - changeSet:
+      id: b09-create-retail-location
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: retail_location
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: address, type: VARCHAR(500), constraints: { nullable: false } }
+              - column: { name: phone, type: VARCHAR(64), constraints: { nullable: false } }
+              - column: { name: hours_text, type: VARCHAR(500), constraints: { nullable: false } }
+              - column: { name: sort_order, type: INT, constraints: { nullable: false }, defaultValueNumeric: 0 }
+              - column: { name: is_active, type: BOOLEAN, constraints: { nullable: false }, defaultValueBoolean: true }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMP, constraints: { nullable: false } }
+        - createIndex:
+            indexName: idx_retail_location_active_sort
+            tableName: retail_location
+            columns:
+              - column: { name: is_active }
+              - column: { name: sort_order }
+
+  - changeSet:
+      id: b09-create-blog-post
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: blog_post
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: slug, type: VARCHAR(255), constraints: { nullable: false, unique: true } }
+              - column: { name: title, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: excerpt, type: VARCHAR(500), constraints: { nullable: true } }
+              - column: { name: body_markdown, type: CLOB, constraints: { nullable: false } }
+              - column: { name: published, type: BOOLEAN, constraints: { nullable: false }, defaultValueBoolean: true }
+              - column: { name: published_at, type: TIMESTAMP, constraints: { nullable: true } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMP, constraints: { nullable: false } }
+        - createIndex:
+            indexName: idx_blog_post_published_at
+            tableName: blog_post
+            columns:
+              - column: { name: published }
+              - column: { name: published_at }

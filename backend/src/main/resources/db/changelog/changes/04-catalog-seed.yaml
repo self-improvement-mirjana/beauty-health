@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: b04-seed-catalog-sql
+      author: beautyhealth
+      # catalog-seed.sql je izmenjen nakon što je changeset već bio primenjen na dev DB;
+      # Liquibase bi inače pao na checksum mismatch (ValidationFailedException).
+      validCheckSum: 9:9fbdffc2b0811e54b8d574e85fed5c7e
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/catalog-seed.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+
+  - changeSet:
+      id: b04-restart-identity-columns
+      author: beautyhealth
+      changes:
+        - sql:
+            splitStatements: true
+            stripComments: false
+            sql: |
+              ALTER TABLE store_location ALTER COLUMN id RESTART WITH 4;
+              ALTER TABLE brand ALTER COLUMN id RESTART WITH 178;
+              ALTER TABLE category ALTER COLUMN id RESTART WITH 122;
+              ALTER TABLE product ALTER COLUMN id RESTART WITH 1663;
+              ALTER TABLE product_option ALTER COLUMN id RESTART WITH 1;
+              ALTER TABLE product_option_value ALTER COLUMN id RESTART WITH 1;
+              ALTER TABLE product_variant ALTER COLUMN id RESTART WITH 1663;
+              ALTER TABLE inventory ALTER COLUMN id RESTART WITH 4987;

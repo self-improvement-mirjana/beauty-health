@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: beauty-health-api
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+    path: /swagger-ui
+
+app:
+  rate-limit:
+    # In-memory per client IP (Bucket4j). Disable in tests via application-test.yml.
+    enabled: true
+    login-per-minute: 10
+    review-posts-per-hour: 5
+  orders:
+    # Tekst rokova isporuke (snapshot se čuva na narudžbini). Kasnije B09/CMS ključ.
+    delivery-summary-text: "Rok isporuke: 3–5 radnih dana (stub do definicije CMS/sekcije 7.3)."
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+      - http://localhost:5174
+      - http://127.0.0.1:5174
+  jwt:
+    # Override in production (see application-prod.yml). Must be >= 32 UTF-8 bytes for HS256.
+    secret: change-me-in-prod-minimum-thirty-two-chars!!
+    expiration-minutes: 60
+  password-reset:
+    # Used to build the reset URL logged at INFO (until e-mail delivery is wired).
+    storefront-base-url: http://localhost:5173
+    token-validity-hours: 2

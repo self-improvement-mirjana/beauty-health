@@ -24,3 +24,7 @@ Tiketi su podeljeni po **tri linije isporuke** iz `SPECIFIKACIJA_ZAHTEVA.md` (od
 ## TBD u specifikaciji
 
 Detalji označeni kao **TBD** u specifikaciji (npr. puna korpa sa stavkama, kompletan checkout, ekran „Moj nalog“ posle prijave) — sekcije **6.5**, **7.3**, **11** — zahtevaju dopunu specifikacije i dodatne tikete kada budu dostupni ulazi (screenshot, wireframe, odluka proizvoda).
+
+## API novac (B02)
+
+Format novčanih iznosa u JSON odgovorima (string `amount` + `currency: "RSD"`) dokumentovan je u [`backend/docs/API_MONEY.md`](../backend/docs/API_MONEY.md); isti dokument je referenciran i iz `backend/README.md`.

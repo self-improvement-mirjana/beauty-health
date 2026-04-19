@@ -1,0 +1,18 @@
+{
+  "name": "beauty-health-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:moderator": "playwright test tests/moderator-smoke.spec.ts",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:headed:slow": "PLAYWRIGHT_SLOW_MO=600 playwright test --headed",
+    "test:headed:slower": "PLAYWRIGHT_SLOW_MO=1200 playwright test --headed",
+    "test:headed:step5s": "PLAYWRIGHT_SLOW_MO=5000 playwright test --headed",
+    "install:browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1"
+  }
+}
