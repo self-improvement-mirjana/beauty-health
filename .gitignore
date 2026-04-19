@@ -13,7 +13,6 @@ moderator/dist/
 .env
 moderator/.env
 
-# Local tooling / caches (repo root)
-.cursor/
+# Local Gradle caches (repo root)
 .gradle-home/
 .gradle-local/
