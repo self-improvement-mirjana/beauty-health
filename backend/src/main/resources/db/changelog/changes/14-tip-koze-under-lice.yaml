@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: b14-tip-koze-parent-lice
+      author: beautyhealth
+      comment: >-
+        Tip kože mora biti pod Lice u stablu da facet filteri na /category/lice (AND sa categoryFacet)
+        pravilno pokrivaju Masna/Suva/… — inače su paralelni koreni i EXISTS(lice) ne uključuje čvorove tipa kože.
+      changes:
+        - sql:
+            sql: UPDATE category SET parent_category_id = 5 WHERE id = 11 AND slug = 'tip-koze';

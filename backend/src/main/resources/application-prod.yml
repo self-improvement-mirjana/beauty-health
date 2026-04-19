@@ -1,0 +1,22 @@
+# Production profile: keep OpenAPI UI/docs off unless explicitly enabled by ops.
+logging:
+  structured:
+    format:
+      console: ecs
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Set real browser origins via env-specific config (comma-separated in deployment) or override this file.
+app:
+  cors:
+    allowed-origins: []
+  jwt:
+    secret: ${APP_JWT_SECRET:}
+    expiration-minutes: ${APP_JWT_EXPIRATION_MINUTES:60}
+  password-reset:
+    storefront-base-url: ${APP_STOREFRONT_BASE_URL:http://localhost:5173}
+    token-validity-hours: ${APP_PASSWORD_RESET_TOKEN_HOURS:2}

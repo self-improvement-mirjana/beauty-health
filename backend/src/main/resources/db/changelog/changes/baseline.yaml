@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: b01-baseline-tag
+      author: beautyhealth
+      comment: Prazna početna tačka šeme; tabele dolaze u kasnijim tiketima (B02+).
+      changes:
+        - tagDatabase:
+            tag: baseline

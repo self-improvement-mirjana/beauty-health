@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: b12-brand-logo-url
+      author: beautyhealth
+      changes:
+        - addColumn:
+            tableName: brand
+            columns:
+              - column: { name: logo_url, type: VARCHAR(2048), constraints: { nullable: true } }
+
+  - changeSet:
+      id: b12-product-primary-image-url
+      author: beautyhealth
+      changes:
+        - addColumn:
+            tableName: product
+            columns:
+              - column: { name: primary_image_url, type: VARCHAR(2048), constraints: { nullable: true } }

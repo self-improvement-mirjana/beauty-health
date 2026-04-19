@@ -1,0 +1,37 @@
+# Posle izmena u backend/src: obnovi JAR u kontejneru — npr.
+#   docker compose build backend && docker compose up -d backend
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: beauty_health
+      POSTGRES_USER: beauty_health
+      POSTGRES_PASSWORD: beauty_health
+    ports:
+      - "5432:5432"
+    volumes:
+      - beauty_health_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beauty_health -d beauty_health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Smoke test against this stack (from host): backend/scripts/demo-api-flow.sh
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/beauty_health
+      SPRING_DATASOURCE_USERNAME: beauty_health
+      SPRING_DATASOURCE_PASSWORD: beauty_health
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  beauty_health_pgdata:

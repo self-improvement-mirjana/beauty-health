@@ -1,0 +1,145 @@
+databaseChangeLog:
+  - changeSet:
+      id: b03-create-users-table
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password_hash
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: full_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: b03-create-roles-table
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  - changeSet:
+      id: b03-create-user-roles-table
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: user_roles
+            columnNames: user_id, role_id
+            constraintName: pk_user_roles
+        - addForeignKeyConstraint:
+            constraintName: fk_user_roles_user
+            baseTableName: user_roles
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_user_roles_role
+            baseTableName: user_roles
+            baseColumnNames: role_id
+            referencedTableName: roles
+            referencedColumnNames: id
+
+  - changeSet:
+      id: b03-seed-roles
+      author: beautyhealth
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: CUSTOMER
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: MODERATOR
+
+  - changeSet:
+      id: b03-seed-moderator-local
+      author: beautyhealth
+      context: local
+      comment: >
+        Dev-only moderator (profile local + liquibase context local).
+        Email moderator@local.test / password ModeratorLocal1!
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: moderator@local.test
+              - column:
+                  name: password_hash
+                  value: '$2a$10$mg7HqOCSdizqXvenHzcie.7srqP9mUgJ8/FKTMELa.bv9yTQoG2ua'
+              - column:
+                  name: full_name
+                  value: Local Moderator
+              - column:
+                  name: created_at
+                  valueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  valueComputed: CURRENT_TIMESTAMP
+        - sql:
+            sql: >
+              INSERT INTO user_roles (user_id, role_id)
+              SELECT u.id, r.id FROM users u JOIN roles r ON r.name = 'MODERATOR'
+              WHERE u.email = 'moderator@local.test';

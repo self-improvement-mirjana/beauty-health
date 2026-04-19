@@ -4,3 +4,15 @@
 .idea/
 .vscode/
 *.log
+
+# Frontend
+node_modules/
+dist/
+moderator/node_modules/
+moderator/dist/
+.env
+moderator/.env
+
+# Local Gradle caches (repo root)
+.gradle-home/
+.gradle-local/

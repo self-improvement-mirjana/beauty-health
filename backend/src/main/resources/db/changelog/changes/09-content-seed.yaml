@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: b09-seed-content-sql
+      author: beautyhealth
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/content-seed.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+
+  - changeSet:
+      id: b09-restart-content-identity
+      author: beautyhealth
+      changes:
+        - sql:
+            splitStatements: true
+            stripComments: false
+            sql: |
+              ALTER TABLE cms_page ALTER COLUMN id RESTART WITH 11;
+              ALTER TABLE retail_location ALTER COLUMN id RESTART WITH 3;
+              ALTER TABLE blog_post ALTER COLUMN id RESTART WITH 3;

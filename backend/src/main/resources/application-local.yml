@@ -1,0 +1,24 @@
+# Aktivira se profilom: local (pogledaj README — ./gradlew bootRun ga podrazumevano uključuje)
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/beauty_health
+    username: beauty_health
+    password: beauty_health
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    # Runs changesets tagged with context "local" (e.g. moderator seed in 03-auth.yaml).
+    contexts: local
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+app:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+      - http://localhost:5174
+      - http://127.0.0.1:5174
