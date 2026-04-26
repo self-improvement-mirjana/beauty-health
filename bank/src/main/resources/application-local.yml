@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/mock_bank
+    username: mock_bank
+    password: mock_bank
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

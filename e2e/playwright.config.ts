@@ -45,5 +45,12 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 180_000,
     },
+    {
+      command: 'npm run dev',
+      cwd: path.join(repoRoot, 'bank-admin'),
+      url: 'http://localhost:5175',
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000,
+    },
   ],
 });

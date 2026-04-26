@@ -9,4 +9,6 @@ import com.beautyhealth.order.domain.PaymentTransaction;
 public interface PaymentTransactionRepository extends JpaRepository<PaymentTransaction, Long> {
 
     Optional<PaymentTransaction> findByOrder_Id(long orderId);
+
+    Optional<PaymentTransaction> findByPaymentRef(String paymentRef);
 }

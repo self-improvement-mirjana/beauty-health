@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: b07-create-card-transaction
+      author: mockbank
+      changes:
+        - createTable:
+            tableName: card_transaction
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: intent_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: card_id, type: BIGINT, constraints: { nullable: true } }
+              - column: { name: status, type: VARCHAR(32), constraints: { nullable: false } }
+              - column: { name: amount, type: "DECIMAL(12,2)", constraints: { nullable: false } }
+              - column: { name: currency, type: VARCHAR(3), defaultValue: "RSD", constraints: { nullable: false } }
+              - column: { name: decline_reason, type: VARCHAR(255), constraints: { nullable: true } }
+              - column: { name: processed_at, type: TIMESTAMP, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            constraintName: fk_tx_intent
+            baseTableName: card_transaction
+            baseColumnNames: intent_id
+            referencedTableName: payment_intent
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_tx_card
+            baseTableName: card_transaction
+            baseColumnNames: card_id
+            referencedTableName: virtual_card
+            referencedColumnNames: id
+        - createIndex:
+            indexName: idx_tx_intent_id
+            tableName: card_transaction
+            columns:
+              - column: { name: intent_id }

@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: b08-create-audit-log
+      author: mockbank
+      changes:
+        - createTable:
+            tableName: audit_log
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: actor_type, type: VARCHAR(32), constraints: { nullable: false } }
+              - column: { name: actor_id, type: VARCHAR(128), constraints: { nullable: false } }
+              - column: { name: action, type: VARCHAR(128), constraints: { nullable: false } }
+              - column: { name: target, type: VARCHAR(255), constraints: { nullable: true } }
+              - column: { name: metadata_json, type: TEXT, constraints: { nullable: true } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+        - createIndex:
+            indexName: idx_audit_created_at
+            tableName: audit_log
+            columns:
+              - column: { name: created_at }

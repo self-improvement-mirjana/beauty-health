@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: b01-create-bank-user
+      author: mockbank
+      changes:
+        - createTable:
+            tableName: bank_user
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: email, type: VARCHAR(255), constraints: { nullable: false, unique: true } }
+              - column: { name: password_hash, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: full_name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: enabled, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMP, constraints: { nullable: false } }
+
+  - changeSet:
+      id: b01-create-bank-user-role
+      author: mockbank
+      changes:
+        - createTable:
+            tableName: bank_user_role
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: role_name, type: VARCHAR(64), constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            constraintName: fk_bank_user_role_user
+            baseTableName: bank_user_role
+            baseColumnNames: user_id
+            referencedTableName: bank_user
+            referencedColumnNames: id
+        - addUniqueConstraint:
+            constraintName: uk_bank_user_role
+            tableName: bank_user_role
+            columnNames: user_id,role_name

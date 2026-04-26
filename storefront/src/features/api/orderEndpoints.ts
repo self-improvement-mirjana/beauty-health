@@ -5,6 +5,7 @@ import type {
   CreateOrderBody,
   CreateOrderResponseDto,
   OrderDetailDto,
+  PaymentStatusDto,
   UserOrderSummaryDto,
 } from '@/features/order/types';
 
@@ -42,7 +43,11 @@ const orderApi = baseApi.injectEndpoints({
       query: (orderId) => `/orders/${orderId}`,
       providesTags: (_r, _e, id) => [{ type: 'Orders', id }],
     }),
+    getPaymentStatus: build.query<PaymentStatusDto, number>({
+      query: (orderId) => `/orders/${orderId}/payment`,
+      providesTags: (_r, _e, id) => [{ type: 'Orders', id: `payment-${id}` }],
+    }),
   }),
 });
 
-export const { useCreateOrderMutation, useListMyOrdersQuery, useBuyAgainItemsQuery, useGetMyOrderQuery } = orderApi;
+export const { useCreateOrderMutation, useListMyOrdersQuery, useBuyAgainItemsQuery, useGetMyOrderQuery, useGetPaymentStatusQuery } = orderApi;

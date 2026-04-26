@@ -8,6 +8,7 @@ export type CreateOrderBody = {
   city: string;
   postalCode: string;
   countryCode: string;
+  paymentMethod?: string;
 };
 
 export type CreateOrderResponseDto = {
@@ -15,6 +16,16 @@ export type CreateOrderResponseDto = {
   status: string;
   total: MoneyDto;
   deliverySummaryText: string;
+  paymentRedirectUrl?: string;
+};
+
+export type PaymentStatusDto = {
+  orderId: number;
+  orderStatus: string;
+  paymentProvider: string;
+  paymentStatus: string;
+  externalStatus: string | null;
+  paymentRef: string | null;
 };
 
 export type UserOrderSummaryDto = {

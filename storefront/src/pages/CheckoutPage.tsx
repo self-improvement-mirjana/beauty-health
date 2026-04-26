@@ -42,6 +42,7 @@ export function CheckoutPage() {
   const [orderDone, setOrderDone] = useState<CreateOrderResponseDto | null>(null);
   const orderDoneRef = useRef(false);
   const orderSubmitInFlightRef = useRef(false);
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'CARD'>('COD');
 
   const {
     register,
@@ -78,9 +79,14 @@ export function CheckoutPage() {
         city: values.city.trim(),
         postalCode: values.postalCode.trim(),
         countryCode: values.countryCode.trim().toUpperCase(),
+        paymentMethod,
       };
       orderSubmitInFlightRef.current = true;
       const res = await createOrder(body).unwrap();
+      if (res.paymentRedirectUrl) {
+        window.location.href = res.paymentRedirectUrl;
+        return;
+      }
       orderDoneRef.current = true;
       setOrderDone(res);
     } catch (e: unknown) {
@@ -262,6 +268,20 @@ export function CheckoutPage() {
           </select>
           {errors.countryCode ? <p className="mt-1 text-xs text-red-600">{errors.countryCode.message}</p> : null}
         </div>
+
+        <fieldset className="space-y-2">
+          <legend className="block text-sm font-medium text-neutral-800">Način plaćanja</legend>
+          <label className="flex items-center gap-2 text-sm text-neutral-700">
+            <input type="radio" name="paymentMethod" value="COD" checked={paymentMethod === 'COD'}
+              onChange={() => setPaymentMethod('COD')} className="accent-neutral-900" />
+            Pouzeće (COD)
+          </label>
+          <label className="flex items-center gap-2 text-sm text-neutral-700">
+            <input type="radio" name="paymentMethod" value="CARD" checked={paymentMethod === 'CARD'}
+              onChange={() => setPaymentMethod('CARD')} className="accent-neutral-900" />
+            Kartica (online plaćanje)
+          </label>
+        </fieldset>
 
         <button
           type="submit"

@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: b15-add-payment-ref-cols
+      author: beautyhealth
+      changes:
+        - addColumn:
+            tableName: payment_transaction
+            columns:
+              - column: { name: payment_ref, type: VARCHAR(64), constraints: { nullable: true } }
+              - column: { name: redirect_url, type: VARCHAR(2048), constraints: { nullable: true } }
+              - column: { name: external_status, type: VARCHAR(32), constraints: { nullable: true } }
+        - addUniqueConstraint:
+            constraintName: uk_payment_transaction_ref
+            tableName: payment_transaction
+            columnNames: payment_ref
