@@ -24,6 +24,7 @@ import com.beautyhealth.order.api.dto.BuyAgainItemResponse;
 import com.beautyhealth.order.api.dto.CreateOrderRequest;
 import com.beautyhealth.order.api.dto.CreateOrderResponse;
 import com.beautyhealth.order.api.dto.OrderDetailResponse;
+import com.beautyhealth.order.api.dto.PaymentStatusResponse;
 import com.beautyhealth.order.api.dto.UserOrderSummaryResponse;
 import com.beautyhealth.order.service.OrderService;
 
@@ -79,5 +80,11 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public OrderDetailResponse getOrder(@AuthenticationPrincipal Object principal, @PathVariable long orderId) {
         return orderService.getOrder(requireUser(principal), orderId);
+    }
+
+    @Operation(summary = "Status plaćanja za narudžbinu")
+    @GetMapping("/{orderId}/payment")
+    public PaymentStatusResponse paymentStatus(@AuthenticationPrincipal Object principal, @PathVariable long orderId) {
+        return orderService.getPaymentStatus(requireUser(principal), orderId);
     }
 }

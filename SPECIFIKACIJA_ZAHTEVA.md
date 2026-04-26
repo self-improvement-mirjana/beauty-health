@@ -238,7 +238,50 @@ Implementacija se deli na **tri isporuke** koje dele isti domen, ali imaju odvoj
 
 - Sistem mora da prikaže informaciju o rokovima isporuke u kontekstu kupovine (globalno ili u checkout-u), npr. “Isporuka do 4–6 radnih dana.”
 
-### 7.3 Načini plaćanja i isporuke (TBD iz UI forme)
+### 7.3 Kartično plaćanje (educational mock PSP)
+
+**Zahtevi**
+
+- Checkout forma nudi dva načina plaćanja:
+  - **Pouzeće (COD)** — podrazumevani, narudžbina se kreira direktno sa statusom `NEW`.
+  - **Kartica (CARD)** — redirect-based flow preko edukativnog mock PSP servisa ("Banka").
+
+**Tok kartičnog plaćanja**
+
+1. Korisnik odabere "Plaćanje karticom" na checkout stranici i potvrdi narudžbinu.
+2. Shop backend kreira narudžbinu i šalje potpisani `POST /api/v1/payments` ka banki.
+3. Banka vraća `paymentRef` i `redirectUrl`.
+4. Storefront redirektuje korisnika na bankin hosted payment page (`/pay/{ref}`).
+5. Korisnik unosi podatke kartice (PAN, exp, CVV, ime) i klikne "Plati".
+6. Banka proverava karticu (validnost, balans), debituje sredstva, i:
+   - Redirektuje korisnika nazad na shop (`/payment/return?ref=...&status=...&orderId=...`).
+   - Asinhrono šalje potpisani webhook ka shop backendu (`POST /api/v1/payments/webhook`).
+7. Shop backend, po prijemu webhook-a, ažurira status narudžbine (`CONFIRMED` ili `CANCELLED`).
+8. Storefront prikazuje rezultat plaćanja na `/payment/return` stranici.
+
+**Potpisivanje (RSA / HMAC)**
+
+- Svi S2S pozivi (shop → banka i banka → shop) se potpisuju RSA-SHA256 ili HMAC-SHA256.
+- Banka izdaje merchant kredencijale (RSA keypair ili HMAC tajnu) kroz admin panel.
+- Potpisuje se kanonički string: `METHOD\npath\ntimestamp\nnonce\nbody`.
+- Timestamp tolerancija: ±5 min. Nonce dedup sprečava replay napade.
+
+**Mock banka — komponente**
+
+| Komponenta | Stack | Port |
+|-----------|-------|------|
+| Bank backend | Java 17, Spring Boot 3.5, PostgreSQL | 8090 |
+| Bank admin | React 18, Redux Toolkit, Tailwind | 5175 |
+
+**Seed podaci banke**
+
+- Admin: `admin@banka.local` / `admin123`
+- Demo kartica: PAN `4242424242424242`, exp 12/2028, CVV `123`, balans 100.000 RSD
+- Demo merchant: `beauty-health` (RSA mode)
+
+**PCI napomena**: Ovo je čisto edukativni servis. PAN se čuva plaintext u bazi. U produkciji bi bio potreban PCI DSS compliance.
+
+### 7.4 Načini plaćanja i isporuke (TBD iz UI forme)
 
 **TBD**
 

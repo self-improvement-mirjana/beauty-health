@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: b04-create-merchant
+      author: mockbank
+      changes:
+        - createTable:
+            tableName: merchant
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: slug, type: VARCHAR(128), constraints: { nullable: false, unique: true } }
+              - column: { name: return_url_success, type: VARCHAR(2048), constraints: { nullable: true } }
+              - column: { name: return_url_failure, type: VARCHAR(2048), constraints: { nullable: true } }
+              - column: { name: webhook_url, type: VARCHAR(2048), constraints: { nullable: true } }
+              - column: { name: signing_mode, type: VARCHAR(16), defaultValue: "RSA", constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(32), defaultValue: "ACTIVE", constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMP, constraints: { nullable: false } }

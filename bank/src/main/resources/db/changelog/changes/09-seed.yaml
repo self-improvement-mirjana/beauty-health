@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: b09-seed-admin
+      author: mockbank
+      context: "!test"
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/seed.sql
+            relativeToChangelogFile: false

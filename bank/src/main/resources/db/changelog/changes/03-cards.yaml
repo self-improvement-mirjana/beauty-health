@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: b03-create-virtual-card
+      author: mockbank
+      changes:
+        - createTable:
+            tableName: virtual_card
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: client_id, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: pan, type: VARCHAR(19), constraints: { nullable: false, unique: true } }
+              - column: { name: pan_last4, type: VARCHAR(4), constraints: { nullable: false } }
+              - column: { name: exp_month, type: INT, constraints: { nullable: false } }
+              - column: { name: exp_year, type: INT, constraints: { nullable: false } }
+              - column: { name: cvv_hash, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: holder_name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: balance, type: "DECIMAL(14,2)", defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: currency, type: VARCHAR(3), defaultValue: "RSD", constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(32), defaultValue: "ACTIVE", constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMP, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            constraintName: fk_card_client
+            baseTableName: virtual_card
+            baseColumnNames: client_id
+            referencedTableName: bank_client
+            referencedColumnNames: id
+        - createIndex:
+            indexName: idx_card_client_id
+            tableName: virtual_card
+            columns:
+              - column: { name: client_id }

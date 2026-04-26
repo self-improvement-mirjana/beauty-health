@@ -26,6 +26,7 @@ import com.beautyhealth.catalog.repo.InventoryRowRepository;
 import com.beautyhealth.catalog.repo.ProductVariantRepository;
 import com.beautyhealth.config.OrderCheckoutProperties;
 import com.beautyhealth.common.money.MoneyResponse;
+import com.beautyhealth.order.api.dto.PaymentStatusResponse;
 import com.beautyhealth.order.api.dto.AdminOrderDetailResponse;
 import com.beautyhealth.order.api.dto.BuyAgainItemResponse;
 import com.beautyhealth.order.api.dto.CreateOrderRequest;
@@ -34,6 +35,7 @@ import com.beautyhealth.order.api.dto.OrderDetailResponse;
 import com.beautyhealth.order.api.dto.OrderLineResponse;
 import com.beautyhealth.order.api.dto.UserOrderSummaryResponse;
 import com.beautyhealth.order.domain.OrderLine;
+import com.beautyhealth.order.domain.OrderStatus;
 import com.beautyhealth.order.domain.PaymentRecordStatus;
 import com.beautyhealth.order.domain.PaymentTransaction;
 import com.beautyhealth.order.domain.Shipment;
@@ -49,6 +51,7 @@ import jakarta.persistence.EntityManager;
 public class OrderService {
 
     public static final String PAYMENT_PROVIDER_COD = "COD";
+    public static final String PAYMENT_PROVIDER_CARD = "CARD";
 
     private final ShopOrderRepository shopOrderRepository;
     private final OrderLineRepository orderLineRepository;
@@ -61,12 +64,13 @@ public class OrderService {
     private final AppUserRepository appUserRepository;
     private final OrderCheckoutProperties orderCheckoutProperties;
     private final EntityManager entityManager;
+    private final BankClient bankClient;
 
     public OrderService(ShopOrderRepository shopOrderRepository, OrderLineRepository orderLineRepository,
             PaymentTransactionRepository paymentTransactionRepository, ShipmentRepository shipmentRepository, CartRepository cartRepository,
             CartItemRepository cartItemRepository, InventoryRowRepository inventoryRowRepository,
             ProductVariantRepository productVariantRepository, AppUserRepository appUserRepository,
-            OrderCheckoutProperties orderCheckoutProperties, EntityManager entityManager) {
+            OrderCheckoutProperties orderCheckoutProperties, EntityManager entityManager, BankClient bankClient) {
         this.shopOrderRepository = shopOrderRepository;
         this.orderLineRepository = orderLineRepository;
         this.paymentTransactionRepository = paymentTransactionRepository;
@@ -78,6 +82,7 @@ public class OrderService {
         this.appUserRepository = appUserRepository;
         this.orderCheckoutProperties = orderCheckoutProperties;
         this.entityManager = entityManager;
+        this.bankClient = bankClient;
     }
 
     @Transactional
@@ -125,19 +130,30 @@ public class OrderService {
         }
 
         shopOrderRepository.save(order);
-        paymentTransactionRepository.save(
-                new PaymentTransaction(order, PAYMENT_PROVIDER_COD, PaymentRecordStatus.PENDING, total, "RSD"));
         shipmentRepository.save(new Shipment(order));
+
+        String paymentMethod = request.paymentMethod();
+        boolean isCard = "CARD".equalsIgnoreCase(paymentMethod);
+        String paymentRedirectUrl = null;
+
+        if (isCard) {
+            BankClient.PaymentIntentResult intent = bankClient.createPaymentIntent(order.getId(), total, "RSD");
+            paymentTransactionRepository.save(new PaymentTransaction(order, PAYMENT_PROVIDER_CARD,
+                    PaymentRecordStatus.PENDING, total, "RSD", intent.paymentRef(), intent.redirectUrl()));
+            paymentRedirectUrl = intent.redirectUrl();
+        } else {
+            paymentTransactionRepository.save(
+                    new PaymentTransaction(order, PAYMENT_PROVIDER_COD, PaymentRecordStatus.PENDING, total, "RSD"));
+        }
 
         long orderId = order.getId();
         String orderStatus = order.getStatus().name();
         String deliveryTextSnapshot = order.getDeliverySummaryText();
 
-        // Native delete avoids Hibernate re-persisting cart lines still referenced in the persistence context.
         entityManager.createNativeQuery("DELETE FROM cart_item WHERE cart_id = ?").setParameter(1, cart.getId()).executeUpdate();
         entityManager.flush();
 
-        return new CreateOrderResponse(orderId, orderStatus, MoneyResponse.rsd(total), deliveryTextSnapshot);
+        return new CreateOrderResponse(orderId, orderStatus, MoneyResponse.rsd(total), deliveryTextSnapshot, paymentRedirectUrl);
     }
 
     @Transactional(readOnly = true)
@@ -221,5 +237,17 @@ public class OrderService {
             row.setQuantity(row.getQuantity() - take);
             remaining -= take;
         }
+    }
+
+    @Transactional(readOnly = true)
+    public PaymentStatusResponse getPaymentStatus(AppUser user, long orderId) {
+        ShopOrder order = shopOrderRepository.findByIdAndUser_Id(orderId, user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        PaymentTransaction payment = paymentTransactionRepository.findByOrder_Id(orderId).orElse(null);
+        return new PaymentStatusResponse(orderId, order.getStatus().name(),
+                payment != null ? payment.getProvider() : "COD",
+                payment != null ? payment.getStatus().name() : "PENDING",
+                payment != null ? payment.getExternalStatus() : null,
+                payment != null ? payment.getPaymentRef() : null);
     }
 }

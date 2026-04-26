@@ -42,6 +42,15 @@ public class PaymentTransaction {
     @Column(nullable = false, length = 3)
     private String currency = "RSD";
 
+    @Column(name = "payment_ref", length = 64, unique = true)
+    private String paymentRef;
+
+    @Column(name = "redirect_url", length = 2048)
+    private String redirectUrl;
+
+    @Column(name = "external_status", length = 32)
+    private String externalStatus;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -58,6 +67,13 @@ public class PaymentTransaction {
         this.status = status;
         this.amount = amount;
         this.currency = currency;
+    }
+
+    public PaymentTransaction(ShopOrder order, String provider, PaymentRecordStatus status, BigDecimal amount,
+            String currency, String paymentRef, String redirectUrl) {
+        this(order, provider, status, amount, currency);
+        this.paymentRef = paymentRef;
+        this.redirectUrl = redirectUrl;
     }
 
     @PrePersist
@@ -87,4 +103,12 @@ public class PaymentTransaction {
     public PaymentRecordStatus getStatus() {
         return status;
     }
+
+    public String getPaymentRef() { return paymentRef; }
+    public void setPaymentRef(String paymentRef) { this.paymentRef = paymentRef; }
+    public String getRedirectUrl() { return redirectUrl; }
+    public void setRedirectUrl(String redirectUrl) { this.redirectUrl = redirectUrl; }
+    public String getExternalStatus() { return externalStatus; }
+    public void setExternalStatus(String externalStatus) { this.externalStatus = externalStatus; }
+    public void setStatus(PaymentRecordStatus status) { this.status = status; }
 }

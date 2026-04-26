@@ -10,7 +10,13 @@
     "test:headed:slow": "PLAYWRIGHT_SLOW_MO=600 playwright test --headed",
     "test:headed:slower": "PLAYWRIGHT_SLOW_MO=1200 playwright test --headed",
     "test:headed:step5s": "PLAYWRIGHT_SLOW_MO=5000 playwright test --headed",
-    "install:browsers": "playwright install chromium"
+    "install:browsers": "playwright install chromium",
+    "stack:up": "bash scripts/up.sh",
+    "stack:down": "bash scripts/down.sh",
+    "demo:moderator": "bash scripts/demo.sh",
+    "screenshots:moderator": "bash scripts/screenshots.sh",
+    "walk:moderator": "playwright test tests/moderator-walkthrough.spec.ts",
+    "walk:moderator:headed": "WALKTHROUGH_PAUSE_MS=2000 PLAYWRIGHT_SLOW_MO=400 playwright test tests/moderator-walkthrough.spec.ts --headed"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1"

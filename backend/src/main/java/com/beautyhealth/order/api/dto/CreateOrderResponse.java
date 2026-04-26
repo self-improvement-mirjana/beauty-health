@@ -9,5 +9,6 @@ public record CreateOrderResponse(
         long orderId,
         String status,
         MoneyResponse total,
-        String deliverySummaryText) {
+        String deliverySummaryText,
+        @Schema(description = "URL za redirect na banku (samo za CARD plaćanje)") String paymentRedirectUrl) {
 }

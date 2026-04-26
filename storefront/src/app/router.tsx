@@ -13,6 +13,7 @@ import { BrandPage } from '@/pages/BrandPage';
 import { BrandsIndexPage } from '@/pages/BrandsIndexPage';
 import { CartPage } from '@/pages/CartPage';
 import { CheckoutPage } from '@/pages/CheckoutPage';
+import { PaymentReturnPage } from '@/pages/PaymentReturnPage';
 import { CategoryPage } from '@/pages/CategoryPage';
 import { CmsPage } from '@/pages/CmsPage';
 import { HomePage } from '@/pages/HomePage';
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      { path: 'payment/return', element: <PaymentReturnPage /> },
       { path: 'cart', element: <CartPage /> },
       {
         path: 'checkout',
