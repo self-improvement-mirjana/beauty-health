@@ -23,3 +23,32 @@ HOCU 2: DA MI NAPRAVIS SKRIPTU KAO OVE, KOJA CE KORSITI NE HEADLESS BROWSER, DA 
 
 SMISLIKAKO DA POKLRENES CELU APLIKACIJU SVE ZIVO I DA NAPUNIS SA PODACIMA, DOCKER TI JE DOSTUPAN
 za ove skripte sada koje ces koristi za demo mozes u javi ili ts sta god ti je lakse da playrightr radi
+
+
+## 2026-05-22
+
+
+### Ecommerce messaging analytics
+
+
+kao sledeci korak u ucenju dizajna distribuiranih sistema
+Sledeci korak nam je da se upoznamo sa konceptom messaginga
+
+Kao svaki eCommerce, bitni su nam podaci i dogadjaji koji se desavaju u nasoj aplikaciji, kako bi bolje mogli da razumem nase korisnike
+
+Da bi uspeli moramo da ih pratimo, recimo mogli bi planiramo arhitekturu tako da 
+Imamo sopstvenu verziju Google Analyics na frontendu + sopstvenu analitiku koju saljemo na bekend i bekend onda to predaje 
+Nekom mikroservisu koga cemo napraviti koji ce biti zaduzen za konzumaciju svih stvari koje se desavaju u sistmeu
+I izradu izvestaja, metrika i hipoteza sta god vec
+
+Kao sto bi Amplitude radio/Spark sta god
+Znaci analytics bekend i ispalivjivanje i godjaj u aplaikiji, kao kupovina korpa itd placenje/uspesnp/ neuspesno sa kojim iznosom kesom karticom sta god
+
+Znaci opet fokus nam je na messagingu da bi razumeli Kafku i interakcija naseg bekenda sa analytics bekendom pri predaji eventa ce ici preko kafke 
+ALI nas analytics bekend ce isto imati obican API KEY auth i neke endpointove da mozemo da izvucemo iz njega izvestaje da prezentujemo na moderatorokom panelu nekako tako sto ce ga nas api koga moderator kositi agregirati
+
+
+### Korekcija za pamet
+
+@.cursor/plans/kafka_analytics_rollout_fcacee85.plan.md  posto ce ovaj plan izvrsiti potencijalno ovaj plan izvrsiti manje pametan LLm model 
+Da li mozes da u podfolderu napravis tikete za ai agente kao da nisu bas pametni, direktne instrukcije i implementacioni guideline za realizaciju ovog plana, format tiketa moze da bude 1-nesto.md 2-nesto.nmd unut tar podfoldera

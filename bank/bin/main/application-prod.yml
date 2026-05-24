@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+bank:
+  master-key: ${BANK_MASTER_KEY}
+  jwt:
+    secret: ${BANK_JWT_SECRET}

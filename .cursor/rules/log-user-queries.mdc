@@ -1,0 +1,37 @@
+---
+alwaysApply: true
+---
+# Logovanje korisnikovih upita u `MOJI_UPITI.md`
+
+PRE bilo kakvog drugog rada na zahtevu, dopisi tekst korisnikove poruke u
+`MOJI_UPITI.md` u korenu repozitorijuma. Logovanje je obavezno za **svaku**
+poruku — uključujući kratke poruke, slash-komande i poruke koje sadrže samo
+priložene fajlove (zabeleži tekst koji je korisnik uneo, čak i ako je prazan
+napiši `(bez teksta)`).
+
+## Pravila
+
+- Beleži se **samo** korisnikova poruka — nikada tvoji odgovori, planovi ili rezimei.
+- Tekst se kopira **doslovno** (verbatim), uključujući velika slova, prelome
+  redova, `@`-mentione i priložene putanje fajlova. Ne prevodi i ne parafraziraj.
+- Dopisuj na **kraj** fajla — ne menjaj postojeći sadržaj.
+- Ako fajl ne postoji, kreiraj ga sa zaglavljem koje već koristi projekat.
+
+## Format
+
+Grupiši po datumu (`## YYYY-MM-DD`). Unutar datuma svaki novi upit ide pod
+podnaslov `### Upit N` (gde je `N` sledeći broj za taj dan). Ako za današnji
+datum već postoji sekcija, samo dodaj novi `### Upit N` na kraj te sekcije; ne
+otvaraj novu sekciju datuma.
+
+```markdown
+## 2026-05-24
+
+### Upit 3
+<doslovan tekst korisnikove poruke ovde>
+```
+
+## Kada NE logovati
+
+- Poruke koje sistem automatski generiše (npr. tool rezultati, sistem reminderi).
+- Tvoji sopstveni odgovori ili interni planovi.
