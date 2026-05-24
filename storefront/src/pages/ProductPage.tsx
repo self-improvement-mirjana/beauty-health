@@ -19,6 +19,7 @@ import { isFetchBaseQueryError } from '@/lib/isFetchBaseQueryError';
 import { formatRsd } from '@/lib/money';
 import { parseApiError } from '@/lib/parseApiError';
 import { stripHtmlToPlainText } from '@/lib/stripHtml';
+import { trackAddToCartClick, trackProductView } from '@/lib/analytics/client';
 
 const SHIPPING_COPY =
   'Porudžbine obrađujemo u roku od 1–3 radna dana. Isporuka je za 4–6 radnih dana. Rokovi se odnose na radne dane i mogu se produžiti u periodu povećanog obima porudžbina.';
@@ -151,6 +152,12 @@ export function ProductPage() {
   }, [data]);
 
   useEffect(() => {
+    if (data?.slug) {
+      trackProductView(data.slug);
+    }
+  }, [data?.slug]);
+
+  useEffect(() => {
     setPdpImgFailed(false);
   }, [data?.slug, data?.primaryImageUrl]);
 
@@ -185,6 +192,11 @@ export function ProductPage() {
       return;
     }
     setCartLineMsg(null);
+    if (data?.slug) {
+      trackAddToCartClick(matched.id, data.slug);
+    } else {
+      trackAddToCartClick(matched.id);
+    }
     void addCartItem({ variantId: matched.id, quantity: 1 })
       .unwrap()
       .then(() => setCartLineMsg('Dodato u korpu.'))

@@ -1,0 +1,188 @@
+[
+  {
+    "eventId": "11111111-1111-4111-8111-111111111101",
+    "eventType": "cart_item_added",
+    "occurredAt": "2026-05-24T10:00:00Z",
+    "source": "backend",
+    "actorType": "guest",
+    "actorId": null,
+    "sessionId": "a3f2c1b0e9d8c7b6",
+    "correlationId": "501",
+    "schemaVersion": "v1",
+    "payload": {
+      "cartId": 501,
+      "variantId": 12,
+      "quantity": 1
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111102",
+    "eventType": "cart_item_updated",
+    "occurredAt": "2026-05-24T10:05:00Z",
+    "source": "backend",
+    "actorType": "user",
+    "actorId": "42",
+    "sessionId": null,
+    "correlationId": "501",
+    "schemaVersion": "v1",
+    "payload": {
+      "cartId": 501,
+      "variantId": 12,
+      "quantity": 2
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111103",
+    "eventType": "cart_item_removed",
+    "occurredAt": "2026-05-24T10:10:00Z",
+    "source": "backend",
+    "actorType": "user",
+    "actorId": "42",
+    "sessionId": null,
+    "correlationId": "501",
+    "schemaVersion": "v1",
+    "payload": {
+      "cartId": 501,
+      "variantId": 12
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111104",
+    "eventType": "checkout_started",
+    "occurredAt": "2026-05-24T10:15:00Z",
+    "source": "backend",
+    "actorType": "user",
+    "actorId": "42",
+    "sessionId": null,
+    "correlationId": "501",
+    "schemaVersion": "v1",
+    "payload": {
+      "cartId": 501,
+      "lineCount": 2
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111105",
+    "eventType": "order_created",
+    "occurredAt": "2026-05-24T10:15:30Z",
+    "source": "backend",
+    "actorType": "user",
+    "actorId": "42",
+    "sessionId": null,
+    "correlationId": "1001",
+    "schemaVersion": "v1",
+    "payload": {
+      "orderId": 1001,
+      "amount": 4599.00,
+      "currency": "RSD",
+      "paymentMethod": "CARD"
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111106",
+    "eventType": "payment_authorized",
+    "occurredAt": "2026-05-24T10:16:00Z",
+    "source": "backend",
+    "actorType": "system",
+    "actorId": null,
+    "sessionId": null,
+    "correlationId": "1001",
+    "schemaVersion": "v1",
+    "payload": {
+      "orderId": 1001,
+      "amount": 4599.00,
+      "currency": "RSD",
+      "paymentMethod": "CARD",
+      "paymentStatus": "AUTHORIZED"
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111107",
+    "eventType": "payment_failed",
+    "occurredAt": "2026-05-24T10:20:00Z",
+    "source": "backend",
+    "actorType": "system",
+    "actorId": null,
+    "sessionId": null,
+    "correlationId": "1002",
+    "schemaVersion": "v1",
+    "payload": {
+      "orderId": 1002,
+      "paymentMethod": "CARD",
+      "paymentStatus": "DECLINED"
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111108",
+    "eventType": "payment_expired",
+    "occurredAt": "2026-05-24T10:25:00Z",
+    "source": "backend",
+    "actorType": "system",
+    "actorId": null,
+    "sessionId": null,
+    "correlationId": "1003",
+    "schemaVersion": "v1",
+    "payload": {
+      "orderId": 1003,
+      "paymentMethod": "CARD",
+      "paymentStatus": "EXPIRED"
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111109",
+    "eventType": "page_view",
+    "occurredAt": "2026-05-24T09:00:00Z",
+    "source": "storefront",
+    "actorType": "guest",
+    "actorId": null,
+    "sessionId": "sess-abc123",
+    "correlationId": null,
+    "schemaVersion": "v1",
+    "payload": {
+      "path": "/shop"
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111110",
+    "eventType": "product_view",
+    "occurredAt": "2026-05-24T09:05:00Z",
+    "source": "storefront",
+    "actorType": "guest",
+    "actorId": null,
+    "sessionId": "sess-abc123",
+    "correlationId": null,
+    "schemaVersion": "v1",
+    "payload": {
+      "productSlug": "hydrating-serum"
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111111",
+    "eventType": "add_to_cart_click",
+    "occurredAt": "2026-05-24T09:06:00Z",
+    "source": "storefront",
+    "actorType": "guest",
+    "actorId": null,
+    "sessionId": "sess-abc123",
+    "correlationId": null,
+    "schemaVersion": "v1",
+    "payload": {
+      "variantId": 12,
+      "productSlug": "hydrating-serum"
+    }
+  },
+  {
+    "eventId": "11111111-1111-4111-8111-111111111112",
+    "eventType": "checkout_open",
+    "occurredAt": "2026-05-24T09:10:00Z",
+    "source": "storefront",
+    "actorType": "user",
+    "actorId": "42",
+    "sessionId": null,
+    "correlationId": null,
+    "schemaVersion": "v1",
+    "payload": {
+      "cartId": 501
+    }
+  }
+]

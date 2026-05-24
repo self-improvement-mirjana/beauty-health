@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.beautyhealth.analytics.model.AnalyticsEventTypes;
+import com.beautyhealth.analytics.service.AnalyticsEventFactory;
+import com.beautyhealth.analytics.service.AnalyticsOutboxService;
 import com.beautyhealth.auth.domain.AppUser;
 import com.beautyhealth.auth.repo.AppUserRepository;
 import com.beautyhealth.cart.api.dto.AddCartItemRequest;
@@ -38,15 +42,20 @@ public class CartService {
     private final ProductVariantRepository productVariantRepository;
     private final ProductOptionRepository productOptionRepository;
     private final AppUserRepository appUserRepository;
+    private final AnalyticsOutboxService analyticsOutboxService;
+    private final AnalyticsEventFactory analyticsEventFactory;
 
     public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository,
             ProductVariantRepository productVariantRepository, ProductOptionRepository productOptionRepository,
-            AppUserRepository appUserRepository) {
+            AppUserRepository appUserRepository, AnalyticsOutboxService analyticsOutboxService,
+            AnalyticsEventFactory analyticsEventFactory) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.productVariantRepository = productVariantRepository;
         this.productOptionRepository = productOptionRepository;
         this.appUserRepository = appUserRepository;
+        this.analyticsOutboxService = analyticsOutboxService;
+        this.analyticsEventFactory = analyticsEventFactory;
     }
 
     public record CartWriteResult(CartResponse response, String guestCartTokenForHeader) {
@@ -94,6 +103,7 @@ public class CartService {
     public CartWriteResult addItem(AppUser user, String guestTokenHeader, AddCartItemRequest request) {
         Cart cart = resolveWritableCart(user, guestTokenHeader, true);
         addItemCore(cart, request.variantId(), request.quantity());
+        emitCartEvent(user, cart, AnalyticsEventTypes.CART_ITEM_ADDED, request.variantId(), request.quantity());
         return finishWrite(user, cart);
     }
 
@@ -106,6 +116,7 @@ public class CartService {
         assertStock(v, request.quantity());
         item.setQuantity(request.quantity());
         item.setUnitPriceSnapshot(effectiveUnitPrice(v));
+        emitCartEvent(user, cart, AnalyticsEventTypes.CART_ITEM_UPDATED, item.getVariant().getId(), request.quantity());
         return finishWrite(user, cart);
     }
 
@@ -114,8 +125,10 @@ public class CartService {
         Cart cart = resolveWritableCart(user, guestTokenHeader, false);
         CartItem item = cartItemRepository.findByIdAndCart_Id(itemId, cart.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart item not found"));
+        long variantId = item.getVariant().getId();
         cart.getItems().remove(item);
         cartItemRepository.delete(item);
+        emitCartEvent(user, cart, AnalyticsEventTypes.CART_ITEM_REMOVED, variantId, item.getQuantity());
         return finishWrite(user, cart);
     }
 
@@ -273,5 +286,14 @@ public class CartService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "guestCartToken is required");
         }
         return t;
+    }
+
+    private void emitCartEvent(AppUser user, Cart cart, String eventType, long variantId, int quantity) {
+        if (cart.getId() == null) {
+            return;
+        }
+        Map<String, Object> payload = Map.of("cartId", cart.getId(), "variantId", variantId, "quantity", quantity);
+        analyticsOutboxService.enqueue(analyticsEventFactory.backendEvent(user, cart.getGuestCartToken(),
+                AnalyticsEventFactory.correlationForCart(cart), eventType, payload));
     }
 }

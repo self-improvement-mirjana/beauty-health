@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: as01-raw-events
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: analytics_events_raw
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: event_id, type: VARCHAR(36), constraints: { nullable: false } }
+              - column: { name: event_type, type: VARCHAR(64), constraints: { nullable: false } }
+              - column: { name: occurred_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: source, type: VARCHAR(16), constraints: { nullable: false } }
+              - column: { name: payload_json, type: CLOB, constraints: { nullable: false } }
+              - column: { name: ingested_at, type: TIMESTAMP, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            constraintName: uk_analytics_events_raw_event_id
+            tableName: analytics_events_raw
+            columnNames: event_id
+        - sql:
+            dbms: postgresql
+            sql: ALTER TABLE analytics_events_raw ALTER COLUMN payload_json TYPE TEXT
+
+  - changeSet:
+      id: as01-kpi-daily
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: analytics_kpi_daily
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: report_day, type: DATE, constraints: { nullable: false } }
+              - column: { name: order_count, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: revenue_total, type: "DECIMAL(14,2)", constraints: { nullable: false } }
+        - addUniqueConstraint:
+            constraintName: uk_analytics_kpi_daily_day
+            tableName: analytics_kpi_daily
+            columnNames: report_day
+
+  - changeSet:
+      id: as01-payments-daily
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: analytics_payments_daily
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: report_day, type: DATE, constraints: { nullable: false } }
+              - column: { name: success_count, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: failure_count, type: BIGINT, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            constraintName: uk_analytics_payments_daily_day
+            tableName: analytics_payments_daily
+            columnNames: report_day
+
+  - changeSet:
+      id: as01-funnel-daily
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: analytics_funnel_daily
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: report_day, type: DATE, constraints: { nullable: false } }
+              - column: { name: checkout_start_count, type: BIGINT, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            constraintName: uk_analytics_funnel_daily_day
+            tableName: analytics_funnel_daily
+            columnNames: report_day

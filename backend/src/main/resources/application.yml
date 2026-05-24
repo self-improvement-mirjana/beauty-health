@@ -12,6 +12,13 @@ spring:
   web:
     resources:
       add-mappings: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 springdoc:
   api-docs:
@@ -51,3 +58,13 @@ app:
     signing-mode: RSA
     private-key-pem: ""
     bank-public-key-pem: ""
+  analytics:
+    topic: bh.analytics.events.v1
+    kafka:
+      enabled: true
+    outbox:
+      poll-interval-ms: 5000
+      batch-size: 50
+    service:
+      base-url: http://localhost:8081
+      api-key: dev-analytics-api-key
