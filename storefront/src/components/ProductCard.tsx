@@ -6,6 +6,7 @@ import { useAddCartItemMutation } from '@/features/api/cartEndpoints';
 import { useWishlistSlug } from '@/hooks/useWishlistSlug';
 import { formatRsd } from '@/lib/money';
 import { parseApiError } from '@/lib/parseApiError';
+import { trackAddToCartClick } from '@/lib/analytics/client';
 import { HeartIcon } from '@/components/WishlistHeartPopover';
 import { StarRating } from '@/components/StarRating';
 
@@ -124,6 +125,7 @@ export function ProductCard({ product }: Props) {
       setCartErr('Nije moguće dodati u korpu bez varijante.');
       return;
     }
+    trackAddToCartClick(vid, product.slug);
     void addItem({ variantId: vid, quantity: 1 })
       .unwrap()
       .catch((e: unknown) => {

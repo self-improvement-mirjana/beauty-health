@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.beautyhealth.analytics.model.AnalyticsEventTypes;
+import com.beautyhealth.analytics.service.AnalyticsEventFactory;
+import com.beautyhealth.analytics.service.AnalyticsOutboxService;
 import com.beautyhealth.auth.domain.AppUser;
 import com.beautyhealth.auth.domain.Role;
 import com.beautyhealth.auth.repo.AppUserRepository;
@@ -65,12 +69,15 @@ public class OrderService {
     private final OrderCheckoutProperties orderCheckoutProperties;
     private final EntityManager entityManager;
     private final BankClient bankClient;
+    private final AnalyticsOutboxService analyticsOutboxService;
+    private final AnalyticsEventFactory analyticsEventFactory;
 
     public OrderService(ShopOrderRepository shopOrderRepository, OrderLineRepository orderLineRepository,
             PaymentTransactionRepository paymentTransactionRepository, ShipmentRepository shipmentRepository, CartRepository cartRepository,
             CartItemRepository cartItemRepository, InventoryRowRepository inventoryRowRepository,
             ProductVariantRepository productVariantRepository, AppUserRepository appUserRepository,
-            OrderCheckoutProperties orderCheckoutProperties, EntityManager entityManager, BankClient bankClient) {
+            OrderCheckoutProperties orderCheckoutProperties, EntityManager entityManager, BankClient bankClient,
+            AnalyticsOutboxService analyticsOutboxService, AnalyticsEventFactory analyticsEventFactory) {
         this.shopOrderRepository = shopOrderRepository;
         this.orderLineRepository = orderLineRepository;
         this.paymentTransactionRepository = paymentTransactionRepository;
@@ -83,6 +90,8 @@ public class OrderService {
         this.orderCheckoutProperties = orderCheckoutProperties;
         this.entityManager = entityManager;
         this.bankClient = bankClient;
+        this.analyticsOutboxService = analyticsOutboxService;
+        this.analyticsEventFactory = analyticsEventFactory;
     }
 
     @Transactional
@@ -93,6 +102,10 @@ public class OrderService {
         if (lines.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cart is empty");
         }
+
+        analyticsOutboxService.enqueue(analyticsEventFactory.backendEvent(user, null,
+                String.valueOf(cart.getId()), AnalyticsEventTypes.CHECKOUT_STARTED,
+                Map.of("cartId", cart.getId(), "lineCount", lines.size())));
 
         List<Long> variantIds = lines.stream().map(ci -> ci.getVariant().getId()).sorted().distinct().toList();
         Map<Long, List<InventoryRow>> lockedByVariant = new LinkedHashMap<>();
@@ -135,6 +148,10 @@ public class OrderService {
         String paymentMethod = request.paymentMethod();
         boolean isCard = "CARD".equalsIgnoreCase(paymentMethod);
         String paymentRedirectUrl = null;
+
+        analyticsOutboxService.enqueue(analyticsEventFactory.backendEvent(user, null, String.valueOf(order.getId()),
+                AnalyticsEventTypes.ORDER_CREATED,
+                Map.of("orderId", order.getId(), "amount", total, "currency", "RSD", "paymentMethod", paymentMethod)));
 
         if (isCard) {
             BankClient.PaymentIntentResult intent = bankClient.createPaymentIntent(order.getId(), total, "RSD");

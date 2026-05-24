@@ -52,3 +52,34 @@ ALI nas analytics bekend ce isto imati obican API KEY auth i neke endpointove da
 
 @.cursor/plans/kafka_analytics_rollout_fcacee85.plan.md  posto ce ovaj plan izvrsiti potencijalno ovaj plan izvrsiti manje pametan LLm model 
 Da li mozes da u podfolderu napravis tikete za ai agente kao da nisu bas pametni, direktne instrukcije i implementacioni guideline za realizaciju ovog plana, format tiketa moze da bude 1-nesto.md 2-nesto.nmd unut tar podfoldera
+
+## 2026-05-24
+
+### Upit 1
+@.cursor/plans/kafka_analytics_rollout_fcacee85_tickets Ukratko, da li moze Mermaid sequence diagram svega sto se desi kada korisnik nesto kupi na sajtu
+Frontend, backend, banka client, banka, nazad bekend, fronmtend analitika?
+
+### Upit 2
+@.cursor/plans @.cursor/plans/1_preferencije_profila_(db→be→fe)_61ffbc51.plan.md  Hajde da implementiramo plan, imao zasebne tikete koji su vrlo specificni sa detaljime implementacije kako bi se pouzdano moglo implementirati i sa slabijim LLM modelom od Oppus-a - ti si composer 2.5 trenutno
+
+### Upit 3
+@.cursor/plans/kafka_analytics_rollout_fcacee85_tickets  ne govorim o tiketima za preferecenije, poledja sadrzaj foldera videcesda ima md fajlova zasebnih
+
+### Upit 4
+nastavi
+
+### Upit 5
+Kafka servisa u docker-compose i smoke skripta za ceo pipeline.
+da i hocu dokaz da ovo radi, u nekom MD ili sta god trag o tome kako moze da se end to end dogadjaj isprati da je predat i snimljen u bazu analytics i kako se dovuce
+
+### Upit 6
+nesto su mi logovi slabi
+Zasto u logovima bekenda i analytics bekenda ne vidim sve sto se desilo
+?
+iako vidim da ti nesto radis, meni izgleda kao da se nista ne desava , da li me lazes
+
+### Upit 6
+@analytics-service dodaj gitignore z aovaj analtyicvs servis da gradle itd ne zavrsi na gitu
+
+### Upit 7
+e sada napravi PR za sve ovo , zasebnu branu, opisi sve sto uradjeno , merguj PR, prebaci se na main  i pulluj kada to sve uradis

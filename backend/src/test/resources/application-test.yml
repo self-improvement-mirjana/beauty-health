@@ -30,3 +30,6 @@ app:
   jwt:
     secret: test-jwt-secret-minimum-thirty-two-bytes!!
     expiration-minutes: 120
+  analytics:
+    kafka:
+      enabled: false

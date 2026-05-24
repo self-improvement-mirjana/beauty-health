@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: b16-create-analytics-outbox
+      author: beautyhealth
+      changes:
+        - createTable:
+            tableName: analytics_outbox
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: event_id, type: VARCHAR(36), constraints: { nullable: false } }
+              - column: { name: event_type, type: VARCHAR(64), constraints: { nullable: false } }
+              - column: { name: topic, type: VARCHAR(128), constraints: { nullable: false } }
+              - column: { name: payload_json, type: CLOB, constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(16), constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: published_at, type: TIMESTAMP, constraints: { nullable: true } }
+              - column: { name: error_message, type: VARCHAR(512), constraints: { nullable: true } }
+        - sql:
+            dbms: postgresql
+            sql: ALTER TABLE analytics_outbox ALTER COLUMN payload_json TYPE TEXT
+        - addUniqueConstraint:
+            constraintName: uk_analytics_outbox_event_id
+            tableName: analytics_outbox
+            columnNames: event_id
+        - createIndex:
+            indexName: idx_analytics_outbox_status_created
+            tableName: analytics_outbox
+            columns:
+              - column: { name: status }
+              - column: { name: created_at }

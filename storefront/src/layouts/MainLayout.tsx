@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 
 import { AddToCartSearchParamsBanner } from '@/components/AddToCartSearchParamsBanner';
+import { AnalyticsRouteTracker } from '@/components/AnalyticsRouteTracker';
 import { AuthBootstrap } from '@/components/AuthBootstrap';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
@@ -12,6 +13,7 @@ export function MainLayout() {
         Preskoči na sadržaj
       </a>
       <AddToCartSearchParamsBanner />
+      <AnalyticsRouteTracker />
       <AuthBootstrap />
       <div className="flex min-h-full flex-col">
         <Header />

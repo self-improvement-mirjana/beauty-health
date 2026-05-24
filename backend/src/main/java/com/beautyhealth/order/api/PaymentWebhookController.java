@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.beautyhealth.analytics.model.AnalyticsEventTypes;
+import com.beautyhealth.analytics.service.AnalyticsEventFactory;
+import com.beautyhealth.analytics.service.AnalyticsOutboxService;
 import com.beautyhealth.order.domain.OrderStatus;
 import com.beautyhealth.order.domain.PaymentRecordStatus;
 import com.beautyhealth.order.domain.PaymentTransaction;
@@ -29,13 +32,18 @@ public class PaymentWebhookController {
     private final ShopOrderRepository orderRepo;
     private final BankClient bankClient;
     private final ObjectMapper objectMapper;
+    private final AnalyticsOutboxService analyticsOutboxService;
+    private final AnalyticsEventFactory analyticsEventFactory;
 
     public PaymentWebhookController(PaymentTransactionRepository paymentRepo, ShopOrderRepository orderRepo,
-            BankClient bankClient, ObjectMapper objectMapper) {
+            BankClient bankClient, ObjectMapper objectMapper, AnalyticsOutboxService analyticsOutboxService,
+            AnalyticsEventFactory analyticsEventFactory) {
         this.paymentRepo = paymentRepo;
         this.orderRepo = orderRepo;
         this.bankClient = bankClient;
         this.objectMapper = objectMapper;
+        this.analyticsOutboxService = analyticsOutboxService;
+        this.analyticsEventFactory = analyticsEventFactory;
     }
 
     @PostMapping(value = "/webhook", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -70,11 +78,19 @@ public class PaymentWebhookController {
                 if (order.getStatus() == OrderStatus.NEW) {
                     order.setStatus(OrderStatus.CONFIRMED);
                 }
-            } else if ("DECLINED".equals(status) || "FAILED".equals(status) || "EXPIRED".equals(status)) {
+                emitPaymentEvent(order, payment, AnalyticsEventTypes.PAYMENT_AUTHORIZED, status);
+            } else if ("DECLINED".equals(status) || "FAILED".equals(status)) {
                 payment.setStatus(PaymentRecordStatus.FAILED);
                 if (order.getStatus() == OrderStatus.NEW) {
                     order.setStatus(OrderStatus.CANCELLED);
                 }
+                emitPaymentEvent(order, payment, AnalyticsEventTypes.PAYMENT_FAILED, status);
+            } else if ("EXPIRED".equals(status)) {
+                payment.setStatus(PaymentRecordStatus.FAILED);
+                if (order.getStatus() == OrderStatus.NEW) {
+                    order.setStatus(OrderStatus.CANCELLED);
+                }
+                emitPaymentEvent(order, payment, AnalyticsEventTypes.PAYMENT_EXPIRED, status);
             }
 
             log.info("Webhook processed: paymentRef={} status={} → orderStatus={}", paymentRef, status, order.getStatus());
@@ -84,5 +100,15 @@ public class PaymentWebhookController {
             log.error("Webhook processing failed", e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid webhook payload");
         }
+    }
+
+    private void emitPaymentEvent(ShopOrder order, PaymentTransaction payment, String eventType, String paymentStatus) {
+        Map<String, Object> payload = Map.of(
+                "orderId", order.getId(),
+                "paymentMethod", payment.getProvider(),
+                "paymentStatus", paymentStatus,
+                "amount", order.getTotalAmount(),
+                "currency", order.getCurrency());
+        analyticsOutboxService.enqueue(analyticsEventFactory.systemEvent(String.valueOf(order.getId()), eventType, payload));
     }
 }

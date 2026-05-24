@@ -67,6 +67,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/v1/locations/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/blog/**").permitAll()
                         .requestMatchers("/api/v1/cart/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/analytics/events").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/payments/webhook").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("MODERATOR")
                         .anyRequest().authenticated())

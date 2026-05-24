@@ -13,6 +13,7 @@ import { formatRsd } from '@/lib/money';
 import { mapApiDetailsToFieldErrors } from '@/lib/mapApiFieldErrors';
 import { parseApiError } from '@/lib/parseApiError';
 import { stripHtmlToPlainText } from '@/lib/stripHtml';
+import { trackCheckoutOpen } from '@/lib/analytics/client';
 
 const SHIPPING_CMS_SLUG = 'isporuka';
 
@@ -63,8 +64,12 @@ export function CheckoutPage() {
     }
     if (!cartLoading && cart?.empty && !orderSubmitInFlightRef.current) {
       navigate('/cart', { replace: true });
+      return;
     }
-  }, [cart?.empty, cartLoading, navigate, orderDone]);
+    if (!cartLoading && cart && !cart.empty) {
+      trackCheckoutOpen();
+    }
+  }, [cart?.empty, cartLoading, navigate, orderDone, cart]);
 
   const shippingPlain = shippingPage ? stripHtmlToPlainText(shippingPage.bodyMarkdown) : '';
   const shippingIntro = shippingPlain || SHIPPING_FALLBACK;

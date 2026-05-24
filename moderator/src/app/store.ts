@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import '@/features/api/analyticsEndpoints';
 import '@/features/api/catalogEndpoints';
 import '@/features/api/contentEndpoints';
 import '@/features/api/orderEndpoints';
