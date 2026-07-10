@@ -10,6 +10,7 @@ Kolekcija kratkih beleški o izmenama i odlukama iz razvoja (frontend, backend, 
 | [02-liquibase-i-docker.md](./02-liquibase-i-docker.md) | Checksum seed-a, `docker compose`, port 8080 |
 | [03-storefront-header-pretraga-mega-meni.md](./03-storefront-header-pretraga-mega-meni.md) | Header, pretraga (fokus, outline), mega meni most |
 | [04-typografija-i-plp.md](./04-typografija-i-plp.md) | Sephora-pristup: sans, crna traka, naslov kategorije |
+| [05-preference-profila-tabele.md](./05-preference-profila-tabele.md) | Preferencije profila: šta je u kojoj tabeli (šablon vs izbor korisnika) |
 
 ## Konvencije
 

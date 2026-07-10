@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
+import { useAppSelector } from '@/app/hooks';
 import { ErrorState } from '@/components/ErrorState';
 import { ListingQuickSortChips } from '@/components/ListingQuickSortChips';
 import { ListingSortBy } from '@/components/ListingSortBy';
@@ -12,12 +13,19 @@ import {
   useListBrandsQuery,
   useListProductsQuery,
 } from '@/features/api/catalogEndpoints';
+import { useGetMePreferencesQuery } from '@/features/api/preferencesEndpoints';
+import { selectAccessToken } from '@/features/auth/authSlice';
 import type { CategoryTreeNodeDto } from '@/features/catalog/types';
 import { normalizeSortKey, type SortKey } from '@/features/catalog/listingSort';
 import { useFallbackFromTopRatedOnServerError } from '@/hooks/useFallbackFromTopRatedOnServerError';
 import { useListingPagination } from '@/hooks/useListingPagination';
 import { formatCategoryCount } from '@/lib/formatCategoryCount';
 import { findCategoryBySlug, getCategoryPath } from '@/lib/categoryTree';
+import {
+  facetSlugoviSaProfilaZaTipKoze,
+  PRIMENI_PROFIL_QUERY,
+  spojiFacetSlugoveZaListing,
+} from '@/lib/beautyProfileFacet';
 import { parseCategoryFacetSearchParams, setCategoryFacetOnParams } from '@/lib/categoryFacetParams';
 import { buildBrandOptions, buildCategoryOptions } from '@/lib/shopListingOptions';
 
@@ -137,6 +145,30 @@ export function CategoryPage() {
     [searchParams.toString()],
   );
 
+  const accessToken = useAppSelector(selectAccessToken);
+  const { data: profilPreference } = useGetMePreferencesQuery('skin_care', {
+    skip: !accessToken?.trim(),
+  });
+  const slugoviProfilaTipKoze = useMemo(
+    () => facetSlugoviSaProfilaZaTipKoze(profilPreference),
+    [profilPreference],
+  );
+  const labeleProfilaTipKoze = useMemo(() => {
+    if (!profilPreference?.categories?.length) {
+      return [];
+    }
+    const kat = profilPreference.categories.find((c) => c.code === 'skin_type');
+    if (!kat) {
+      return [];
+    }
+    return kat.options.filter((o) => o.selected && o.catalogCategorySlug?.trim()).map((o) => o.label);
+  }, [profilPreference]);
+  const primeniProfil = searchParams.get(PRIMENI_PROFIL_QUERY) === '1';
+  const listingFacetSlugovi = useMemo(
+    () => spojiFacetSlugoveZaListing(selectedFacetSlugs, slugoviProfilaTipKoze, primeniProfil),
+    [selectedFacetSlugs, slugoviProfilaTipKoze, primeniProfil],
+  );
+
   /** Stari bookmarkovi sa više `categoryFacet=` — spoji u jedan parametar da URL i zahtev budu isti kao šta API očekuje. */
   useEffect(() => {
     if (searchParams.getAll('categoryFacet').length <= 1) {
@@ -168,7 +200,7 @@ export function CategoryPage() {
       page,
       size,
       categorySlug: slug || undefined,
-      ...(selectedFacetSlugs.length ? { categoryFacet: selectedFacetSlugs } : {}),
+      ...(listingFacetSlugovi.length ? { categoryFacet: listingFacetSlugovi } : {}),
       brandSlug: brandSlug || undefined,
       ...(featuredOnly ? { featured: true } : {}),
       ...(ratingMin != null ? { minRating: ratingMin } : {}),
@@ -191,7 +223,7 @@ export function CategoryPage() {
   const skipChildCounts = !slug || childCategories.length === 0;
   /** Batch ne primenjuje facet filtere — tada brojimo preko listinga. */
   const skipBatchChildCounts =
-    skipChildCounts || !!brandSlug || featuredOnly || ratingMin != null || selectedFacetSlugs.length > 0;
+    skipChildCounts || !!brandSlug || featuredOnly || ratingMin != null || listingFacetSlugovi.length > 0;
   const {
     data: childProductCounts,
     isError: childCountsError,
@@ -287,9 +319,24 @@ export function CategoryPage() {
     nextParams.delete('categoryFacet');
     nextParams.delete('featured');
     nextParams.delete('ratingMin');
+    nextParams.delete(PRIMENI_PROFIL_QUERY);
     nextParams.delete('page');
     setSearchParams(nextParams, { replace: true });
   }, [searchParams, setSearchParams]);
+
+  const setPrimeniProfil = useCallback(
+    (ukljuceno: boolean) => {
+      const p = new URLSearchParams(searchParams);
+      if (ukljuceno) {
+        p.set(PRIMENI_PROFIL_QUERY, '1');
+      } else {
+        p.delete(PRIMENI_PROFIL_QUERY);
+      }
+      p.delete('page');
+      setSearchParams(p, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
 
   const toggleFacet = useCallback(
     (facetSlug: string) => {
@@ -383,7 +430,7 @@ export function CategoryPage() {
                       useProductTotalFallback={useFallbackSidebarCounts}
                       featuredOnly={featuredOnly}
                       ratingMin={ratingMin}
-                      categoryFacet={selectedFacetSlugs}
+                      categoryFacet={listingFacetSlugovi}
                       batchCount={
                         useFallbackSidebarCounts
                           ? undefined
@@ -404,6 +451,10 @@ export function CategoryPage() {
               selectedCategorySlug={slug}
               selectedFacetSlugs={selectedFacetSlugs}
               onFacetToggle={toggleFacet}
+              primeniProfilUkljuceno={primeniProfil}
+              profilFacetLabele={labeleProfilaTipKoze}
+              mozePrimenaProfila={Boolean(accessToken?.trim() && slugoviProfilaTipKoze.length > 0)}
+              onPrimeniProfilChange={setPrimeniProfil}
               selectedBrandSlug={brandSlug}
               selectedRatingMin={ratingMin}
               onRatingMinChange={updateRatingMin}
@@ -449,7 +500,11 @@ export function CategoryPage() {
         </aside>
 
         <div className="min-w-0 bg-white">
-          {(brandSlug || featuredOnly || ratingMin != null || selectedFacetSlugs.length > 0) && (
+          {(brandSlug ||
+            featuredOnly ||
+            ratingMin != null ||
+            selectedFacetSlugs.length > 0 ||
+            primeniProfil) && (
             <div className="mb-4 flex flex-wrap items-center gap-2">
               <span className="text-sm text-neutral-600">Aktivni filteri:</span>
               {selectedFacetSlugs.map((fs) => (
@@ -459,9 +514,18 @@ export function CategoryPage() {
                   onClick={() => toggleFacet(fs)}
                   className="rounded-full border border-neutral-300 bg-white px-3 py-1 text-xs text-neutral-800 hover:border-neutral-900"
                 >
-                  kategorija (facet): {fs} ×
+                  facet: {fs} ×
                 </button>
               ))}
+              {primeniProfil ? (
+                <button
+                  type="button"
+                  onClick={() => setPrimeniProfil(false)}
+                  className="rounded-full border border-emerald-600/40 bg-emerald-50 px-3 py-1 text-xs text-emerald-950 hover:border-emerald-800"
+                >
+                  primena profila (tip kože) ×
+                </button>
+              ) : null}
               {ratingMin != null ? (
                 <button
                   type="button"

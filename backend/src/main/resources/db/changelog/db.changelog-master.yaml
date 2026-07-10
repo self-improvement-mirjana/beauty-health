@@ -27,3 +27,5 @@ databaseChangeLog:
       file: db/changelog/changes/14-tip-koze-under-lice.yaml
   - include:
       file: db/changelog/changes/15-bank-card-payment.yaml
+  - include:
+      file: db/changelog/changes/16-preference-schema.yaml

@@ -1,15 +1,23 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { useAppSelector } from '@/app/hooks';
 import { ListingQuickSortChips } from '@/components/ListingQuickSortChips';
 import { ListingSortBy } from '@/components/ListingSortBy';
 import { useListProductsQuery, useCategoryTreeQuery, useListBrandsQuery } from '@/features/api/catalogEndpoints';
+import { useGetMePreferencesQuery } from '@/features/api/preferencesEndpoints';
+import { selectAccessToken } from '@/features/auth/authSlice';
 import { normalizeSortKey, type SortKey } from '@/features/catalog/listingSort';
 import { ProductListing } from '@/components/ProductListing';
 import { ShopListingFilters } from '@/components/ShopListingFilters';
 import { useFallbackFromTopRatedOnServerError } from '@/hooks/useFallbackFromTopRatedOnServerError';
 import { useListingPagination } from '@/hooks/useListingPagination';
 import { parseCategoryFacetSearchParams, setCategoryFacetOnParams } from '@/lib/categoryFacetParams';
+import {
+  facetSlugoviSaProfilaZaTipKoze,
+  PRIMENI_PROFIL_QUERY,
+  spojiFacetSlugoveZaListing,
+} from '@/lib/beautyProfileFacet';
 import { buildBrandOptions, buildCategoryOptions } from '@/lib/shopListingOptions';
 
 export function ShopPage() {
@@ -31,6 +39,30 @@ export function ShopPage() {
     [searchParams.toString()],
   );
 
+  const accessToken = useAppSelector(selectAccessToken);
+  const { data: profilPreference } = useGetMePreferencesQuery('skin_care', {
+    skip: !accessToken?.trim(),
+  });
+  const slugoviProfilaTipKoze = useMemo(
+    () => facetSlugoviSaProfilaZaTipKoze(profilPreference),
+    [profilPreference],
+  );
+  const labeleProfilaTipKoze = useMemo(() => {
+    if (!profilPreference?.categories?.length) {
+      return [];
+    }
+    const kat = profilPreference.categories.find((c) => c.code === 'skin_type');
+    if (!kat) {
+      return [];
+    }
+    return kat.options.filter((o) => o.selected && o.catalogCategorySlug?.trim()).map((o) => o.label);
+  }, [profilPreference]);
+  const primeniProfil = searchParams.get(PRIMENI_PROFIL_QUERY) === '1';
+  const listingFacetSlugovi = useMemo(
+    () => spojiFacetSlugoveZaListing(selectedFacetSlugs, slugoviProfilaTipKoze, primeniProfil),
+    [selectedFacetSlugs, slugoviProfilaTipKoze, primeniProfil],
+  );
+
   useEffect(() => {
     if (searchParams.getAll('categoryFacet').length <= 1) {
       return;
@@ -45,7 +77,7 @@ export function ShopPage() {
     page,
     size,
     categorySlug: selectedCategorySlug || undefined,
-    ...(selectedFacetSlugs.length ? { categoryFacet: selectedFacetSlugs } : {}),
+    ...(listingFacetSlugovi.length ? { categoryFacet: listingFacetSlugovi } : {}),
     brandSlug: selectedBrandSlug || undefined,
     ...(featuredOnly ? { featured: true } : {}),
     ...(ratingMin != null ? { minRating: ratingMin } : {}),
@@ -139,9 +171,24 @@ export function ShopPage() {
     nextParams.delete('brand');
     nextParams.delete('featured');
     nextParams.delete('ratingMin');
+    nextParams.delete(PRIMENI_PROFIL_QUERY);
     nextParams.delete('page');
     setSearchParams(nextParams, { replace: true });
   }
+
+  const setPrimeniProfil = useCallback(
+    (ukljuceno: boolean) => {
+      const p = new URLSearchParams(searchParams);
+      if (ukljuceno) {
+        p.set(PRIMENI_PROFIL_QUERY, '1');
+      } else {
+        p.delete(PRIMENI_PROFIL_QUERY);
+      }
+      p.delete('page');
+      setSearchParams(p, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
 
   function updateRatingMin(value: number | null) {
     const nextParams = new URLSearchParams(searchParams);
@@ -170,6 +217,10 @@ export function ShopPage() {
             selectedCategorySlug={selectedCategorySlug}
             selectedFacetSlugs={selectedFacetSlugs}
             onFacetToggle={toggleFacet}
+            primeniProfilUkljuceno={primeniProfil}
+            profilFacetLabele={labeleProfilaTipKoze}
+            mozePrimenaProfila={Boolean(accessToken?.trim() && slugoviProfilaTipKoze.length > 0)}
+            onPrimeniProfilChange={setPrimeniProfil}
             selectedBrandSlug={selectedBrandSlug}
             selectedRatingMin={ratingMin}
             onRatingMinChange={updateRatingMin}
@@ -193,6 +244,7 @@ export function ShopPage() {
         <div className="min-w-0">
           {(selectedCategorySlug ||
             selectedFacetSlugs.length > 0 ||
+            primeniProfil ||
             selectedBrandSlug ||
             featuredOnly ||
             ratingMin != null) && (
@@ -205,9 +257,18 @@ export function ShopPage() {
                   onClick={() => toggleFacet(fs)}
                   className="rounded-full border border-neutral-300 bg-white px-3 py-1 text-xs text-neutral-800 hover:border-neutral-900"
                 >
-                  kategorija (facet): {fs} ×
+                  facet: {fs} ×
                 </button>
               ))}
+              {primeniProfil ? (
+                <button
+                  type="button"
+                  onClick={() => setPrimeniProfil(false)}
+                  className="rounded-full border border-emerald-600/40 bg-emerald-50 px-3 py-1 text-xs text-emerald-950 hover:border-emerald-800"
+                >
+                  primena profila (tip kože) ×
+                </button>
+              ) : null}
               {ratingMin != null ? (
                 <button
                   type="button"

@@ -4,6 +4,8 @@ import { RequireAuth } from '@/components/RequireAuth';
 import { AccountLayout } from '@/layouts/AccountLayout';
 import { MainLayout } from '@/layouts/MainLayout';
 import { AccountBuyAgainPage } from '@/pages/AccountBuyAgainPage';
+import { BeautyPreferencesHubPage } from '@/pages/BeautyPreferencesHubPage';
+import { BeautyPreferencesPage } from '@/pages/BeautyPreferencesPage';
 import { AccountDashboardPage } from '@/pages/AccountDashboardPage';
 import { AccountInformationPage } from '@/pages/AccountInformationPage';
 import { AccountOrderDetailPage } from '@/pages/AccountOrderDetailPage';
@@ -56,6 +58,8 @@ export const router = createBrowserRouter([
               { path: 'porudzbine', id: ACCOUNT_ORDERS_LIST_ROUTE_ID, element: <AccountOrdersPage /> },
               { path: 'porudzbina/:orderId', id: ACCOUNT_ORDER_DETAIL_ROUTE_ID, element: <AccountOrderDetailPage /> },
               { path: 'ponovo-kupi', element: <AccountBuyAgainPage /> },
+              { path: 'preferencije', element: <BeautyPreferencesHubPage /> },
+              { path: 'preferencije/:domainCode', element: <BeautyPreferencesPage /> },
             ],
           },
         ],

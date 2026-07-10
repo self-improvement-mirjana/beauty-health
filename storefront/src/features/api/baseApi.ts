@@ -53,7 +53,18 @@ const baseQueryWithGuestCart: BaseQueryFn<string | FetchArgs, unknown, unknown> 
 
 export const baseApi = createApi({
   reducerPath: 'api',
-  tagTypes: ['Cart', 'CartSummary', 'Reviews', 'Product', 'ProductList', 'Orders', 'AuthSession'],
+  tagTypes: [
+    'Cart',
+    'CartSummary',
+    'Reviews',
+    'Product',
+    'ProductList',
+    'Orders',
+    'AuthSession',
+    'PreferenceTaxonomy',
+    'UserPreferences',
+    'UserPreferencesOverview',
+  ],
   baseQuery: baseQueryWithGuestCart,
   endpoints: () => ({}),
 });

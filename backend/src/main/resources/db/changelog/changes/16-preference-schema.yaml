@@ -1,0 +1,287 @@
+databaseChangeLog:
+  - changeSet:
+      id: b15-preference-tables
+      author: beautyhealth
+      comment: >-
+        Takson beauty preferenci (domen → kategorija → opcija) i korisnički izbori.
+      changes:
+        - createTable:
+            tableName: preference_domain
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: slug
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: preference_category
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: domain_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: selection_type
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0
+              - column:
+                  name: counts_toward_progress
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: true
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            constraintName: uq_pref_category_domain_code
+            tableName: preference_category
+            columnNames: domain_id, code
+        - addForeignKeyConstraint:
+            constraintName: fk_pref_category_domain
+            baseTableName: preference_category
+            baseColumnNames: domain_id
+            referencedTableName: preference_domain
+            referencedColumnNames: id
+        - createIndex:
+            indexName: idx_pref_category_domain
+            tableName: preference_category
+            columns:
+              - column:
+                  name: domain_id
+
+        - createTable:
+            tableName: preference_option
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: label
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0
+              - column:
+                  name: icon_url
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: catalog_category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            constraintName: uq_pref_option_category_code
+            tableName: preference_option
+            columnNames: category_id, code
+        - addForeignKeyConstraint:
+            constraintName: fk_pref_option_category
+            baseTableName: preference_option
+            baseColumnNames: category_id
+            referencedTableName: preference_category
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_pref_option_catalog_category
+            baseTableName: preference_option
+            baseColumnNames: catalog_category_id
+            referencedTableName: category
+            referencedColumnNames: id
+            onDelete: SET NULL
+        - createIndex:
+            indexName: idx_pref_option_category
+            tableName: preference_option
+            columns:
+              - column:
+                  name: category_id
+
+        - createTable:
+            tableName: user_preference_selection
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: preference_option_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: user_preference_selection
+            columnNames: user_id, preference_option_id
+            constraintName: pk_user_preference_selection
+        - addForeignKeyConstraint:
+            constraintName: fk_ups_user
+            baseTableName: user_preference_selection
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_ups_option
+            baseTableName: user_preference_selection
+            baseColumnNames: preference_option_id
+            referencedTableName: preference_option
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            indexName: idx_ups_user
+            tableName: user_preference_selection
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            indexName: idx_ups_option
+            tableName: user_preference_selection
+            columns:
+              - column:
+                  name: preference_option_id
+
+  - changeSet:
+      id: b15-preference-seed
+      author: beautyhealth
+      comment: Seed domen „Negu kože“ sa šest kategorija za napredak x/6 i vezama ka facet tipu kože.
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/preference-seed.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+      rollback:
+        - sql:
+            sql: >-
+              DELETE FROM user_preference_selection;
+              DELETE FROM preference_option;
+              DELETE FROM preference_category;
+              DELETE FROM preference_domain;
+
+  - changeSet:
+      id: b15-preference-sequence-sync-postgresql
+      author: beautyhealth
+      dbms: postgresql
+      comment: Poravnanje sekvenci posle eksplicitnih ID u seed-u (samo PostgreSQL).
+      changes:
+        - sql:
+            splitStatements: true
+            stripComments: false
+            sql: |
+              SELECT setval(pg_get_serial_sequence('preference_domain', 'id'), GREATEST((SELECT MAX(id) FROM preference_domain), 1));
+              SELECT setval(pg_get_serial_sequence('preference_category', 'id'), GREATEST((SELECT MAX(id) FROM preference_category), 1));
+              SELECT setval(pg_get_serial_sequence('preference_option', 'id'), GREATEST((SELECT MAX(id) FROM preference_option), 1));

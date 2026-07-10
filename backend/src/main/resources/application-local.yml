@@ -1,4 +1,18 @@
 # Aktivira se profilom: local (pogledaj README — ./gradlew bootRun ga podrazumevano uključuje)
+logging:
+  file:
+    name: logs/beauty-health-api.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 14
+      total-size-cap: 200MB
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/beauty_health

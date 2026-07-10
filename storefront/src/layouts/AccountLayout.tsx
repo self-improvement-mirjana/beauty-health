@@ -42,6 +42,9 @@ export function AccountLayout() {
           <NavLink to="/account" end className={subNavCls}>
             Pregled
           </NavLink>
+          <NavLink to="/account/preferencije" className={subNavCls}>
+            Preferencije lepote
+          </NavLink>
           <NavLink to="/account/informacije" className={subNavCls}>
             Podaci o nalogu
           </NavLink>

@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 import { ErrorState } from '@/components/ErrorState';
 import type { CategoryTreeNodeDto } from '@/features/catalog/types';
@@ -136,6 +137,12 @@ type Props = {
   countCategoryForActiveFilters?: boolean;
   /** Na /category/:slug sakriti „Reset kategorije“ (kontekst je uvek iz URL putanje). */
   showCategoryResetButton?: boolean;
+  /** Faza 2: uključuje `categoryFacet` iz sačuvanog tipa kože (profil). */
+  primeniProfilUkljuceno?: boolean;
+  mozePrimenaProfila?: boolean;
+  onPrimeniProfilChange?: (ukljuceno: boolean) => void;
+  /** Nazivi opcija sa profila (npr. „Masna koža“) za prikaz pored čekboksa. */
+  profilFacetLabele?: string[];
 };
 
 export function ShopListingFilters({
@@ -165,6 +172,10 @@ export function ShopListingFilters({
   onClearAll,
   countCategoryForActiveFilters = true,
   showCategoryResetButton = true,
+  primeniProfilUkljuceno = false,
+  mozePrimenaProfila = false,
+  onPrimeniProfilChange,
+  profilFacetLabele = [],
 }: Props) {
   const [brandSearch, setBrandSearch] = useState('');
   const [brandListExpanded, setBrandListExpanded] = useState(false);
@@ -197,7 +208,8 @@ export function ShopListingFilters({
     selectedFacetSlugs.length > 0 ||
     Boolean(selectedBrandSlug) ||
     featuredOnly ||
-    selectedRatingMin != null;
+    selectedRatingMin != null ||
+    primeniProfilUkljuceno;
 
   const brandSearchNorm = normalizeForSearch(brandSearch);
   const brandsFiltered = useMemo(() => {
@@ -215,7 +227,7 @@ export function ShopListingFilters({
     <>
       <span
         className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-neutral-400 text-[9px] font-bold text-neutral-600"
-        title="Filteri prilagođeni vašim izborima"
+        title="Predlozi na osnovu podešavanja naloga"
       >
         i
       </span>
@@ -255,9 +267,42 @@ export function ShopListingFilters({
           </div>
         </FilterAccordion>
 
-        {/* Redosled kao na Sephora skincare PLP */}
-        <FilterAccordion title="Vaše beauty preference" titleExtra={beautyPrefsExtra}>
-          <label className={categoryToggleCls(false)}>
+        {/* Preferencije profila + listing */}
+        <FilterAccordion title="Preferencije sa profila" titleExtra={beautyPrefsExtra}>
+          {mozePrimenaProfila && onPrimeniProfilChange ? (
+            <>
+              <label className={categoryToggleCls(false)}>
+                <input
+                  type="checkbox"
+                  checked={primeniProfilUkljuceno}
+                  onChange={(e) => onPrimeniProfilChange(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 bg-white text-neutral-900 focus:ring-neutral-400"
+                />
+                <span>
+                  Primeni moje preference (tip kože)
+                  {profilFacetLabele.length > 0 ? (
+                    <span className="text-neutral-600"> — {profilFacetLabele.join(', ')}</span>
+                  ) : null}
+                </span>
+              </label>
+              <PlaceholderNote>
+                Sužava listu proizvoda kao da ste u filteru „Tip kože“ označili istu vrednost sa profila. Možete isključiti u bilo kom trenutku.
+              </PlaceholderNote>
+            </>
+          ) : (
+            <PlaceholderNote>
+              Prijavite se i sačuvajte tip kože na stranici preferenci da bismo ovde mogli da predložimo odgovarajući facet.
+            </PlaceholderNote>
+          )}
+          {!mozePrimenaProfila ? (
+            <Link
+              to="/account/preferencije"
+              className="mt-2 inline-block text-xs font-semibold text-[rgb(0,76,151)] hover:underline"
+            >
+              Otvori podešavanja: Preferencije lepote
+            </Link>
+          ) : null}
+          <label className={`${categoryToggleCls(false)} mt-4 border-t border-neutral-100 pt-4`}>
             <input
               type="checkbox"
               checked={featuredOnly}
@@ -424,7 +469,7 @@ export function ShopListingFilters({
           </FilterAccordion>
         ) : null}
 
-        <FilterAccordion title="Preference pri kupovini">
+        <FilterAccordion title="Preferencije pri kupovini">
           <PlaceholderNote>Besplatna dostava, poklon uz porudžbinu i slično — proširenja uskoro.</PlaceholderNote>
         </FilterAccordion>
 

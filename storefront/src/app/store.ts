@@ -5,6 +5,7 @@ import '@/features/api/cartEndpoints';
 import '@/features/api/catalogEndpoints';
 import '@/features/api/contentEndpoints';
 import '@/features/api/orderEndpoints';
+import '@/features/api/preferencesEndpoints';
 import '@/features/api/systemEndpoints';
 import { baseApi } from '@/features/api/baseApi';
 import { authSlice, type AuthState } from '@/features/auth/authSlice';

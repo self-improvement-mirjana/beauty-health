@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useAppSelector } from '@/app/hooks';
+import { useGetMePreferencesQuery } from '@/features/api/preferencesEndpoints';
+import { selectAccessToken } from '@/features/auth/authSlice';
 import { usePopoverDock } from '@/hooks/usePopoverDock';
 import type { UserDto } from '@/features/auth/types';
 import { readAuthSession } from '@/lib/authSession';
@@ -161,6 +164,11 @@ export function AccountMenuPopover({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dock = usePopoverDock(open, triggerRef);
   const effectiveUser = user ?? readAuthSession()?.payload.user ?? null;
+  const accessToken = useAppSelector(selectAccessToken);
+  const { data: prefsMe } = useGetMePreferencesQuery('skin_care', {
+    skip: !accessToken?.trim(),
+  });
+  const profilePercent = prefsMe?.progress?.percent ?? 0;
 
   const handleRootLeave = (e: React.MouseEvent) => {
     const next = e.relatedTarget as Node | null;
@@ -268,8 +276,18 @@ export function AccountMenuPopover({
               <p className="mt-1 text-xs leading-relaxed text-neutral-600">
                 Dopunite profil za bolje preporuke i brži pristup porudžbinama.
               </p>
+              <Link
+                to="/account/preferencije"
+                className="mt-2 inline-block text-xs font-semibold text-[rgb(0,76,151)] hover:underline"
+                onClick={() => onFlyoutCloseNow()}
+              >
+                Preferencije lepote — podesite profil
+              </Link>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-neutral-200">
-                <div className="h-full w-[36%] rounded-full bg-emerald-600/90" />
+                <div
+                  className="h-full rounded-full bg-emerald-600/90 transition-[width] duration-300"
+                  style={{ width: `${Math.min(100, Math.max(0, profilePercent))}%` }}
+                />
               </div>
               <p className="mt-1.5 text-[10px] text-neutral-400">
                 Ime i lozinku menjate u podešavanjima; telefon i adrese uskoro.
