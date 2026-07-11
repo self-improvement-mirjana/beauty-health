@@ -18,11 +18,13 @@ import com.beautyhealth.catalog.domain.Product;
 
 @Entity
 @Table(name = "review")
-public class ProductReview {
+public class ProductReview { 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private Long product_id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id")
@@ -40,6 +42,7 @@ public class ProductReview {
 
     @Column(name = "author_name", nullable = false)
     private String authorName;
+
 
     @Column(name = "author_email", nullable = false, length = 255)
     private String authorEmail;
@@ -115,4 +118,4 @@ public class ProductReview {
     public Instant getCreatedAt() {
         return createdAt;
     }
-}
+} // VARCHAR(255)
